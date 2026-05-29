@@ -345,12 +345,12 @@ import { StatusBadgeComponent } from '../../shared/components/status-badge/statu
     font-weight: 600;
     color: var(--primary);
     background: var(--primary-subtle);
-    border: 1px solid rgba(99, 102, 241, 0.2);
+    border: 1px solid rgba(212, 168, 83, 0.2);
     border-radius: var(--radius-sm);
     transition: var(--transition-fast);
 
     &:hover {
-      background: rgba(99, 102, 241, 0.15);
+      background: rgba(212, 168, 83, 0.15);
     }
   }
 

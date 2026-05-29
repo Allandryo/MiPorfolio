@@ -122,7 +122,7 @@ import { WatchlistService } from '../../../core/services/watchlist.service';
       &.active {
         color: #fff;
         background: var(--primary-subtle);
-        border: 1px solid rgba(99, 102, 241, 0.2);
+        border: 1px solid rgba(212, 168, 83, 0.2);
 
         .material-symbols-outlined {
           color: var(--primary);
@@ -141,7 +141,7 @@ import { WatchlistService } from '../../../core/services/watchlist.service';
       border-radius: var(--radius-full);
       font-size: 0.65rem;
       font-weight: 700;
-      color: #fff;
+      color: #0b0d11; // Dark text for amber gold badge
     }
 
     .mobile-toggle {
@@ -173,7 +173,7 @@ import { WatchlistService } from '../../../core/services/watchlist.service';
         left: 0;
         right: 0;
         flex-direction: column;
-        background: rgba(8, 8, 14, 0.95);
+        background: rgba(10, 10, 12, 0.96);
         backdrop-filter: blur(20px);
         border-bottom: 1px solid var(--border);
         padding: 1rem;

@@ -1,43 +1,43 @@
-/* Professional Dark Design System */
+/* Professional Warm Midnight Design System */
 
 :root {
-  // Brand Colors — refined indigo palette
-  --primary-hsl: 239, 84%, 67%;
+  // Brand Colors — refined amber gold palette
+  --primary-hsl: 38, 92%, 60%;
   --primary: hsl(var(--primary-hsl));
-  --primary-hover: hsl(239, 84%, 58%);
-  --primary-subtle: hsla(var(--primary-hsl), 0.10);
-  --secondary-hsl: 199, 89%, 48%;
+  --primary-hover: hsl(38, 92%, 50%);
+  --primary-subtle: hsla(var(--primary-hsl), 0.08);
+  --secondary-hsl: 28, 90%, 55%;
   --secondary: hsl(var(--secondary-hsl));
-  --accent: #6366f1;
+  --accent: hsl(38, 92%, 60%);
 
   // Semantic Colors
-  --success: #22c55e;
+  --success: #10b981;
   --warning: #f59e0b;
   --danger: #ef4444;
 
-  // Dark Theme Palette — refined charcoal & slate
-  --bg-dark-hsl: 224, 20%, 5%;
+  // Dark Theme Palette — warm charcoal & premium slate
+  --bg-dark-hsl: 220, 13%, 7%;
   --bg-dark: hsl(var(--bg-dark-hsl));
-  --bg-deep: #0b0d11;
+  --bg-deep: hsl(220, 15%, 4%);
 
-  --surface-hsl: 224, 16%, 9%;
+  --surface-hsl: 220, 10%, 11%;
   --surface: hsl(var(--surface-hsl));
-  --surface-card: rgba(15, 17, 23, 0.75);
-  --surface-card-hover: rgba(22, 25, 34, 0.85);
-  --surface-elevated: rgba(25, 28, 38, 0.9);
+  --surface-card: rgba(18, 18, 22, 0.72);
+  --surface-card-hover: rgba(26, 26, 32, 0.82);
+  --surface-elevated: rgba(32, 32, 40, 0.9);
 
-  --border: rgba(255, 255, 255, 0.07);
-  --border-focus: rgba(99, 102, 241, 0.45);
-  --border-hover: rgba(255, 255, 255, 0.13);
+  --border: rgba(255, 255, 255, 0.05);
+  --border-focus: rgba(212, 168, 83, 0.45);
+  --border-hover: rgba(255, 255, 255, 0.10);
 
   // Typography
   --font-heading: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
-  // Text Colors
-  --text-primary: #e8eaed;
-  --text-secondary: #9aa0ab;
-  --text-muted: #5f6672;
+  // Text Colors (Warm Tone Off-whites & Grays)
+  --text-primary: #f0ece4;
+  --text-secondary: #a39f96;
+  --text-muted: #6e6b64;
 
   // Transitions
   --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
@@ -45,10 +45,10 @@
   --transition-spring: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 
   // Shadows & Radii
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.35);
-  --shadow-lg: 0 8px 28px rgba(0, 0, 0, 0.4);
-  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.5);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 16px 56px rgba(0, 0, 0, 0.6);
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
@@ -71,7 +71,7 @@ html {
 body {
   font-family: var(--font-body);
   color: var(--text-primary);
-  background: var(--bg-dark);
+  background: radial-gradient(circle at 50% 0%, hsl(220, 12%, 10%) 0%, var(--bg-deep) 100%);
   background-attachment: fixed;
   min-height: 100vh;
   line-height: 1.6;
@@ -88,10 +88,10 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(212, 168, 83, 0.08);
   border-radius: var(--radius-full);
   &:hover {
-    background: rgba(255, 255, 255, 0.16);
+    background: rgba(212, 168, 83, 0.2);
   }
 }
 
@@ -133,6 +133,7 @@ a {
   background: var(--surface-card);
   border: 1px solid var(--border);
   box-shadow: var(--shadow-md);
+  backdrop-filter: blur(12px);
 }
 
 .surface-card {
@@ -141,6 +142,7 @@ a {
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
   transition: var(--transition-normal);
+  backdrop-filter: blur(8px);
 
   &:hover {
     background: var(--surface-card-hover);
@@ -167,7 +169,7 @@ a {
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
   background: var(--primary);
-  color: #fff;
+  color: #0b0d11;
   border: none;
   border-radius: var(--radius-md);
   cursor: pointer;
@@ -207,7 +209,7 @@ a {
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.02);
   border: 1px solid var(--border);
   color: var(--text-primary);
   border-radius: var(--radius-md);
@@ -217,13 +219,13 @@ a {
   font-size: 0.9rem;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: var(--border-hover);
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(212, 168, 83, 0.3);
     color: #fff;
   }
 
   &:active {
-    background: rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.03);
   }
 }
 
@@ -234,16 +236,20 @@ a {
 
 // Text utilities
 .text-gradient {
-  color: #fff;
+  background: linear-gradient(135deg, #fff 30%, var(--primary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .text-gradient-primary {
-  color: var(--primary);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 // Forms
 .input-glass {
-  background: rgba(10, 12, 18, 0.6);
+  background: rgba(10, 10, 12, 0.6);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: 0.75rem 1rem;
@@ -260,7 +266,7 @@ a {
   &:focus {
     border-color: var(--border-focus);
     box-shadow: 0 0 0 2px var(--primary-subtle);
-    background: rgba(10, 12, 18, 0.85);
+    background: rgba(10, 10, 12, 0.85);
   }
 }
 
@@ -283,9 +289,9 @@ a {
 .shimmer {
   background: linear-gradient(
     90deg,
-    rgba(255, 255, 255, 0.03) 25%,
-    rgba(255, 255, 255, 0.06) 37%,
-    rgba(255, 255, 255, 0.03) 63%
+    rgba(255, 255, 255, 0.02) 25%,
+    rgba(255, 255, 255, 0.05) 37%,
+    rgba(255, 255, 255, 0.02) 63%
   );
   background-size: 400% 100%;
   animation: shimmer 1.4s ease infinite;
@@ -311,31 +317,31 @@ a {
   text-transform: uppercase;
   letter-spacing: 0.05em;
   border-radius: var(--radius-sm);
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.04);
   color: var(--text-secondary);
 
   &.badge-primary {
     background: var(--primary-subtle);
-    border-color: rgba(99, 102, 241, 0.2);
-    color: #818cf8;
+    border-color: rgba(212, 168, 83, 0.15);
+    color: var(--primary);
   }
 
   &.badge-secondary {
-    background: rgba(14, 165, 233, 0.1);
-    border-color: rgba(14, 165, 233, 0.2);
-    color: #38bdf8;
+    background: rgba(212, 168, 83, 0.06);
+    border-color: rgba(212, 168, 83, 0.12);
+    color: var(--primary);
   }
 
   &.badge-success {
-    background: rgba(34, 197, 94, 0.1);
-    border-color: rgba(34, 197, 94, 0.2);
+    background: rgba(16, 185, 129, 0.08);
+    border-color: rgba(16, 185, 129, 0.16);
     color: var(--success);
   }
 
   &.badge-warning {
-    background: rgba(245, 158, 11, 0.1);
-    border-color: rgba(245, 158, 11, 0.2);
+    background: rgba(245, 158, 11, 0.08);
+    border-color: rgba(245, 158, 11, 0.16);
     color: var(--warning);
   }
 }

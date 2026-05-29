@@ -22,7 +22,7 @@ import { CommonModule } from '@angular/common';
     .skeleton-card {
       border-radius: var(--radius-md);
       overflow: hidden;
-      background: var(--surface-glass);
+      background: var(--surface-card);
       border: 1px solid var(--border);
     }
 

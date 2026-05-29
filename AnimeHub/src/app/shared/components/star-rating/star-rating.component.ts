@@ -26,7 +26,7 @@ import { CommonModule } from '@angular/common';
       display: inline-flex;
       align-items: center;
       gap: 0.15rem;
-      color: #ffb300;
+      color: var(--primary);
       font-size: 0.85rem;
     }
     .star-icon {

@@ -343,7 +343,7 @@ interface Tab {
     }
     .tab-btn.active {
       background: var(--primary-subtle);
-      border: 1px solid rgba(99, 102, 241, 0.25);
+      border: 1px solid rgba(212, 168, 83, 0.25);
       color: #fff;
     }
     .tab-btn.active .tab-icon {
@@ -460,7 +460,7 @@ interface Tab {
     .poster-overlay {
       position: absolute;
       inset: 0;
-      background: rgba(99, 102, 241, 0.25);
+      background: rgba(212, 168, 83, 0.25);
       display: flex;
       align-items: center;
       justify-content: center;

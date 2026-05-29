@@ -3,7 +3,7 @@
 Versión: 1.0  
 Arquitectura: Feature First + Component Driven  
 Framework Frontend: Angular  
-Paradigma UI: Minimalista  
+Paradigma UI: Minimalista profesional elegante, sin tanto color neon o brillo excesivo 
 Estrategia de Renderizado: SPA  
 Estrategia de Componentes: Web Components con Angular Elements
 
@@ -105,7 +105,7 @@ Mostrar listas de anime obtenidas desde la API de Jikan.
 La página principal debe mostrar:
 
 - Animes recientes
-- Top airing
+- Top animes
 - Temporada actual
 - Animes populares
 
@@ -200,7 +200,6 @@ La página de detalle debe incluir:
 - Géneros
 - Puntuación
 - Trailer
-- Personajes
 - Estado
 
 ---

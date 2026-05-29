@@ -787,7 +787,7 @@ interface SectionData {
       &.active {
         border-color: var(--primary);
         background: var(--primary-subtle);
-        color: #818cf8;
+        color: var(--primary);
       }
     }
 
@@ -814,7 +814,7 @@ interface SectionData {
       font-size: 0.85rem;
 
       option {
-        background: #0f1117;
+        background: #121216;
         color: #fff;
       }
     }
@@ -867,7 +867,7 @@ interface SectionData {
       height: 80px;
       border-radius: 50%;
       background: var(--primary-subtle);
-      border: 1px solid rgba(99, 102, 241, 0.25);
+      border: 1px solid rgba(212, 168, 83, 0.25);
       display: flex;
       align-items: center;
       justify-content: center;

@@ -137,8 +137,8 @@ import { WatchlistService } from '../../../core/services/watchlist.service';
       font-size: 0.8rem;
       font-weight: 700;
       font-family: var(--font-heading);
-      color: #ffb300;
-      border: 1px solid rgba(255, 179, 0, 0.2);
+      color: var(--primary);
+      border: 1px solid rgba(212, 168, 83, 0.2);
     }
 
     .airing-badge {
@@ -208,9 +208,9 @@ import { WatchlistService } from '../../../core/services/watchlist.service';
     .type-tag {
       padding: 0.1rem 0.4rem;
       background: var(--primary-subtle);
-      border: 1px solid rgba(99, 102, 241, 0.2);
+      border: 1px solid rgba(212, 168, 83, 0.2);
       border-radius: 4px;
-      color: #818cf8;
+      color: var(--primary);
       font-weight: 600;
       font-size: 0.7rem;
       text-transform: uppercase;
