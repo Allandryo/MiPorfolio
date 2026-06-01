@@ -71,26 +71,29 @@ import kotlin.math.sqrt
 import kotlin.random.Random
 
 // --- Game Colors ---
-val DarkBackground = Color(0xFF0A0E1A)
-val NeonBlue = Color(0xFF00D4FF)
-val NeonBlueGlow = Color(0xFF0088CC)
-val DarkBlue = Color(0xFF001F3F)
-val CannonballDark = Color(0xFF1A1A2E)
-val CannonballHighlight = Color(0xFF3A3A5E)
+val DarkBackground = Color(0xFFF8FAFC) // Light/White slate-50 background
+val NeonBlue = Color(0xFF0EA5E9)      // Rich Sky Blue (vibrant for light theme)
+val NeonBlueGlow = Color(0xFF38BDF8)  // Light Sky Blue glow
+val DarkBlue = Color(0xFFE2E8F0)      // Grid boundary
+val CannonballDark = Color(0xFF334155)  // Slate-700
+val CannonballHighlight = Color(0xFF64748B) // Slate-500
 val ExplosionOrange = Color(0xFFFF6B35)
 val ExplosionYellow = Color(0xFFFFD700)
-val ScoreGold = Color(0xFFFFD700)
-val GameOverRed = Color(0xFFFF4757)
-val GridLineColor = Color(0xFF1A2040)
-val StarColor = Color(0xFF2A3060)
+val ScoreGold = Color(0xFFD97706)     // Amber 600 for contrast
+val GameOverRed = Color(0xFFEF4444)   // Red 500
+val GridLineColor = Color(0xFFE2E8F0)  // Slate-200 grid lines
+val StarColor = Color(0xFF93C5FD)      // Soft celeste particles
 
 // --- Data Classes ---
 data class Cannonball(
     val id: Int,
     var x: Float,
     var y: Float,
+    var vx: Float,
+    var vy: Float,
     val radius: Float,
     val speed: Float,
+    val gravity: Float = 0.12f,
     val trail: MutableList<Offset> = mutableListOf()
 )
 
@@ -137,6 +140,11 @@ fun GameScreen() {
     var difficulty by remember { mutableFloatStateOf(1f) }
     var showGameOver by remember { mutableStateOf(false) }
 
+    var lives by remember { mutableIntStateOf(3) }
+    var lastHitFrame by remember { mutableLongStateOf(-100L) }
+    val playerTrail = remember { mutableStateListOf<Offset>() }
+    val isInvulnerable = frameTime - lastHitFrame < 90 // 1.5s at 60fps
+
     val cannonballs = remember { mutableStateListOf<Cannonball>() }
     val particles = remember { mutableStateListOf<Particle>() }
     val stars = remember {
@@ -176,22 +184,66 @@ fun GameScreen() {
                 score++
                 difficulty = 1f + (score / 500f) * 0.5f
 
-                // Spawn cannonballs
+                // Update player trail
+                playerTrail.add(Offset(playerX, playerY))
+                if (playerTrail.size > 8) {
+                    playerTrail.removeAt(0)
+                }
+
+                // Spawn cannonballs with 3 types of trajectories (Top, Left, Right)
                 spawnTimer += deltaTime
                 val spawnInterval = (0.8f / difficulty).coerceAtLeast(0.2f)
                 if (spawnTimer >= spawnInterval) {
                     spawnTimer = 0f
                     val radius = Random.nextFloat() * 12f + 14f
-                    val speed = (Random.nextFloat() * 4f + 3f) * difficulty
-                    cannonballs.add(
-                        Cannonball(
-                            id = cannonballIdCounter++,
-                            x = Random.nextFloat() * (screenWidthPx - radius * 2) + radius,
-                            y = -radius * 2,
-                            radius = radius,
-                            speed = speed
-                        )
-                    )
+                    val baseSpeed = (Random.nextFloat() * 4f + 3f) * difficulty
+                    
+                    val spawnType = Random.nextInt(3)
+                    val ball = when (spawnType) {
+                        1 -> { // Left Cannon: fire from left edge to the right in a high arc
+                            val vyInit = -(Random.nextFloat() * 3f + 3f) * difficulty
+                            val vxInit = (Random.nextFloat() * 3f + 4f) * difficulty
+                            Cannonball(
+                                id = cannonballIdCounter++,
+                                x = -radius,
+                                y = Random.nextFloat() * (screenHeightPx * 0.4f) + 150f,
+                                vx = vxInit,
+                                vy = vyInit,
+                                radius = radius,
+                                speed = baseSpeed,
+                                gravity = 0.14f * difficulty.coerceAtMost(2f)
+                            )
+                        }
+                        2 -> { // Right Cannon: fire from right edge to the left in a high arc
+                            val vyInit = -(Random.nextFloat() * 3f + 3f) * difficulty
+                            val vxInit = -(Random.nextFloat() * 3f + 4f) * difficulty
+                            Cannonball(
+                                id = cannonballIdCounter++,
+                                x = screenWidthPx + radius,
+                                y = Random.nextFloat() * (screenHeightPx * 0.4f) + 150f,
+                                vx = vxInit,
+                                vy = vyInit,
+                                radius = radius,
+                                speed = baseSpeed,
+                                gravity = 0.14f * difficulty.coerceAtMost(2f)
+                            )
+                        }
+                        else -> { // Top Spawner: drop from top with a minor horizontal angle
+                            val vxInit = Random.nextFloat() * 4f - 2f
+                            val vyInit = baseSpeed
+                            Cannonball(
+                                id = cannonballIdCounter++,
+                                x = Random.nextFloat() * (screenWidthPx - radius * 2) + radius,
+                                y = -radius * 2,
+                                vx = vxInit,
+                                vy = vyInit,
+                                radius = radius,
+                                speed = baseSpeed,
+                                gravity = 0.06f * difficulty.coerceAtMost(2f)
+                            )
+                        }
+                    }
+                    cannonballs.add(ball)
                 }
 
                 // Update cannonballs
@@ -202,10 +254,16 @@ fun GameScreen() {
                     if (ball.trail.size > 6) {
                         ball.trail.removeAt(0)
                     }
-                    ball.y += ball.speed * (deltaTime * 60f)
+                    
+                    // Natural parabolic motion: apply gravity and update coords
+                    ball.vy += ball.gravity * (deltaTime * 60f)
+                    ball.x += ball.vx * (deltaTime * 60f)
+                    ball.y += ball.vy * (deltaTime * 60f)
 
-                    // Remove off-screen
-                    if (ball.y > screenHeightPx + ball.radius * 2) {
+                    // Remove off-screen (including left/right boundaries)
+                    if (ball.y > screenHeightPx + ball.radius * 2 ||
+                        ball.x < -ball.radius * 3 ||
+                        ball.x > screenWidthPx + ball.radius * 3) {
                         toRemove.add(ball)
                     }
 
@@ -217,29 +275,59 @@ fun GameScreen() {
                     val distance = sqrt(distX * distX + distY * distY)
 
                     if (distance < ball.radius) {
-                        // Collision! Game over!
-                        gameState = GameState.GAME_OVER
-                        if (score > highScore) highScore = score
+                        // Collision! Only handle damage if player is not invulnerable
+                        if (!isInvulnerable) {
+                            lastHitFrame = frameTime
+                            lives--
+                            
+                            // Remove the cannonball immediately upon impact
+                            toRemove.add(ball)
 
-                        // Spawn explosion particles
-                        repeat(40) {
-                            val angle = Random.nextFloat() * Math.PI.toFloat() * 2f
-                            val speed2 = Random.nextFloat() * 8f + 2f
-                            val colors = listOf(ExplosionOrange, ExplosionYellow, NeonBlue, Color.White)
-                            particles.add(
-                                Particle(
-                                    x = playerX,
-                                    y = playerY,
-                                    vx = kotlin.math.cos(angle) * speed2,
-                                    vy = kotlin.math.sin(angle) * speed2,
-                                    life = 1f,
-                                    maxLife = 1f,
-                                    color = colors[Random.nextInt(colors.size)],
-                                    size = Random.nextFloat() * 6f + 2f
-                                )
-                            )
+                            if (lives <= 0) {
+                                // Game over!
+                                gameState = GameState.GAME_OVER
+                                if (score > highScore) highScore = score
+
+                                // Spawn massive explosion particles (using NeonBlueGlow instead of White for visibility)
+                                repeat(40) {
+                                    val angle = Random.nextFloat() * Math.PI.toFloat() * 2f
+                                    val speed2 = Random.nextFloat() * 8f + 2f
+                                    val colors = listOf(ExplosionOrange, ExplosionYellow, NeonBlue, NeonBlueGlow)
+                                    particles.add(
+                                        Particle(
+                                            x = playerX,
+                                            y = playerY,
+                                            vx = kotlin.math.cos(angle) * speed2,
+                                            vy = kotlin.math.sin(angle) * speed2,
+                                            life = 1f,
+                                            maxLife = 1f,
+                                            color = colors[Random.nextInt(colors.size)],
+                                            size = Random.nextFloat() * 6f + 2f
+                                        )
+                                    )
+                                }
+                                break
+                            } else {
+                                // Spawn small impact splash of particles
+                                repeat(15) {
+                                    val angle = Random.nextFloat() * Math.PI.toFloat() * 2f
+                                    val speed2 = Random.nextFloat() * 5f + 2f
+                                    val colors = listOf(ExplosionOrange, NeonBlue, NeonBlueGlow)
+                                    particles.add(
+                                        Particle(
+                                            x = closestX,
+                                            y = closestY,
+                                            vx = kotlin.math.cos(angle) * speed2,
+                                            vy = kotlin.math.sin(angle) * speed2,
+                                            life = 0.6f,
+                                            maxLife = 0.6f,
+                                            color = colors[Random.nextInt(colors.size)],
+                                            size = Random.nextFloat() * 4f + 2f
+                                        )
+                                    )
+                                }
+                            }
                         }
-                        break
                     }
                 }
                 cannonballs.removeAll(toRemove)
@@ -308,11 +396,11 @@ fun GameScreen() {
             // Draw background grid
             drawGrid(screenWidthPx, screenHeightPx)
 
-            // Draw stars
+            // Draw stars as celestial soft particles
             for (star in stars) {
                 drawCircle(
                     color = StarColor.copy(alpha = star.alpha),
-                    radius = star.size,
+                    radius = star.size * 2f, // slightly larger soft particles
                     center = Offset(star.x, star.y)
                 )
             }
@@ -333,11 +421,11 @@ fun GameScreen() {
 
                 // Draw cannonballs
                 for (ball in cannonballs) {
-                    // Outer glow
+                    // Outer glow (soft slate gray glow)
                     drawCircle(
                         brush = Brush.radialGradient(
                             colors = listOf(
-                                Color(0xFF2A2A4E).copy(alpha = 0.4f),
+                                Color(0xFF64748B).copy(alpha = 0.15f),
                                 Color.Transparent
                             ),
                             center = Offset(ball.x, ball.y),
@@ -353,7 +441,7 @@ fun GameScreen() {
                             colors = listOf(
                                 CannonballHighlight,
                                 CannonballDark,
-                                Color(0xFF0D0D1E)
+                                Color(0xFF1E293B)
                             ),
                             center = Offset(ball.x - ball.radius * 0.3f, ball.y - ball.radius * 0.3f),
                             radius = ball.radius * 1.2f
@@ -371,15 +459,39 @@ fun GameScreen() {
 
                     // Cannonball border
                     drawCircle(
-                        color = Color(0xFF3A3A6E).copy(alpha = 0.5f),
+                        color = Color(0xFF475569).copy(alpha = 0.5f),
                         radius = ball.radius,
                         center = Offset(ball.x, ball.y),
                         style = Stroke(width = 1.5f)
                     )
                 }
 
-                // Draw player cube (only when playing or just died)
+                // Draw player trail first
                 if (gameState == GameState.PLAYING) {
+                    for (i in playerTrail.indices) {
+                        val trailPos = playerTrail[i]
+                        val trailRatio = (i.toFloat() / playerTrail.size)
+                        val trailAlpha = trailRatio * 0.35f
+                        val trailScaleSize = playerSize * (0.5f + trailRatio * 0.5f)
+                        val halfTrailSize = trailScaleSize / 2f
+                        
+                        drawRect(
+                            brush = Brush.linearGradient(
+                                colors = listOf(
+                                    NeonBlueGlow.copy(alpha = trailAlpha),
+                                    NeonBlue.copy(alpha = trailAlpha * 0.4f)
+                                ),
+                                start = Offset(trailPos.x - halfTrailSize, trailPos.y - halfTrailSize),
+                                end = Offset(trailPos.x + halfTrailSize, trailPos.y + halfTrailSize)
+                            ),
+                            topLeft = Offset(trailPos.x - halfTrailSize, trailPos.y - halfTrailSize),
+                            size = Size(trailScaleSize, trailScaleSize)
+                        )
+                    }
+                }
+
+                // Draw player cube (only when playing or just died)
+                if (gameState == GameState.PLAYING && (!isInvulnerable || (frameTime / 4) % 2 == 0L)) {
                     // Glow effect
                     drawCircle(
                         brush = Brush.radialGradient(
@@ -397,7 +509,7 @@ fun GameScreen() {
 
                     // Player cube shadow
                     drawRect(
-                        color = Color.Black.copy(alpha = 0.3f),
+                        color = Color.Black.copy(alpha = 0.15f), // softer shadow for light background
                         topLeft = Offset(playerX - halfPlayer + 4f, playerY - halfPlayer + 4f),
                         size = Size(playerSize, playerSize)
                     )
@@ -406,9 +518,9 @@ fun GameScreen() {
                     drawRect(
                         brush = Brush.linearGradient(
                             colors = listOf(
-                                Color(0xFF00E5FF),
+                                Color(0xFF38BDF8), // Light sky blue
                                 NeonBlue,
-                                Color(0xFF0077B6)
+                                Color(0xFF0284C7)  // Deep sky blue
                             ),
                             start = Offset(playerX - halfPlayer, playerY - halfPlayer),
                             end = Offset(playerX + halfPlayer, playerY + halfPlayer)
@@ -421,7 +533,7 @@ fun GameScreen() {
                     drawRect(
                         brush = Brush.linearGradient(
                             colors = listOf(
-                                Color.White.copy(alpha = 0.25f),
+                                Color.White.copy(alpha = 0.35f),
                                 Color.Transparent
                             ),
                             start = Offset(playerX - halfPlayer, playerY - halfPlayer),
@@ -487,32 +599,55 @@ fun GameScreen() {
             }
         }
 
-        // HUD - Score display
+        // HUD - Score and Lives display
         if (gameState == GameState.PLAYING) {
-            Column(
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 48.dp, start = 20.dp, end = 20.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .padding(top = 48.dp, start = 24.dp, end = 24.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "SCORE",
-                    style = TextStyle(
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = NeonBlue.copy(alpha = 0.7f),
-                        letterSpacing = 4.sp
+                // Lives indicator (Left)
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    repeat(3) { index ->
+                        val active = index < lives
+                        Text(
+                            text = "❤️",
+                            fontSize = 22.sp,
+                            modifier = Modifier
+                                .blur(if (active && isInvulnerable && (frameTime / 8) % 2 == 0L) 1.dp else 0.dp),
+                            alpha = if (active) 1f else 0.2f
+                        )
+                    }
+                }
+
+                // Score (Right)
+                Column(
+                    horizontalAlignment = Alignment.End
+                ) {
+                    Text(
+                        text = "SCORE",
+                        style = TextStyle(
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF64748B),
+                            letterSpacing = 3.sp
+                        )
                     )
-                )
-                Text(
-                    text = "$score",
-                    style = TextStyle(
-                        fontSize = 48.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White,
-                        letterSpacing = 2.sp
+                    Text(
+                        text = "$score",
+                        style = TextStyle(
+                            fontSize = 32.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = Color(0xFF0F172A),
+                            letterSpacing = 1.sp
+                        )
                     )
-                )
+                }
             }
         }
 
@@ -541,7 +676,7 @@ fun GameScreen() {
                     style = TextStyle(
                         fontSize = 52.sp,
                         fontWeight = FontWeight.Black,
-                        color = Color.White,
+                        color = Color(0xFF0F172A), // Slate 900 for light theme contrast
                         letterSpacing = 12.sp,
                         textAlign = TextAlign.Center
                     )
@@ -552,7 +687,7 @@ fun GameScreen() {
                     style = TextStyle(
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Normal,
-                        color = Color.White.copy(alpha = 0.5f),
+                        color = Color(0xFF475569), // Slate 600
                         textAlign = TextAlign.Center
                     )
                 )
@@ -569,6 +704,9 @@ fun GameScreen() {
                         spawnTimer = 0f
                         difficulty = 1f
                         cannonballIdCounter = 0
+                        lives = 3
+                        lastHitFrame = -100L
+                        playerTrail.clear()
                         gameState = GameState.PLAYING
                     },
                     modifier = Modifier
@@ -609,7 +747,7 @@ fun GameScreen() {
                     style = TextStyle(
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Normal,
-                        color = Color.White.copy(alpha = 0.3f),
+                        color = Color(0xFF94A3B8), // Slate 400
                         textAlign = TextAlign.Center
                     )
                 )
@@ -713,6 +851,9 @@ fun GameScreen() {
                         spawnTimer = 0f
                         difficulty = 1f
                         cannonballIdCounter = 0
+                        lives = 3
+                        lastHitFrame = -100L
+                        playerTrail.clear()
                         showGameOver = false
                         gameState = GameState.PLAYING
                     },
