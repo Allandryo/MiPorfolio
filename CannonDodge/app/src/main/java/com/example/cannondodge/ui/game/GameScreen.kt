@@ -70,6 +70,8 @@ import kotlin.math.roundToInt
 import kotlin.math.sqrt
 import kotlin.random.Random
 
+import androidx.compose.ui.draw.alpha
+
 // --- Game Colors ---
 val DarkBackground = Color(0xFFF8FAFC) // Light/White slate-50 background
 val NeonBlue = Color(0xFF0EA5E9)      // Rich Sky Blue (vibrant for light theme)
@@ -615,12 +617,18 @@ fun GameScreen() {
                 ) {
                     repeat(3) { index ->
                         val active = index < lives
+
                         Text(
                             text = "❤️",
                             fontSize = 22.sp,
                             modifier = Modifier
-                                .blur(if (active && isInvulnerable && (frameTime / 8) % 2 == 0L) 1.dp else 0.dp),
-                            alpha = if (active) 1f else 0.2f
+                                .blur(
+                                    if (active && isInvulnerable && (frameTime / 8) % 2 == 0L)
+                                        1.dp
+                                    else
+                                        0.dp
+                                )
+                                .alpha(if (active) 1f else 0.2f)
                         )
                     }
                 }
