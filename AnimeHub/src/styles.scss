@@ -1,43 +1,42 @@
-/* Professional Warm Midnight Design System */
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Sora:wght@400;600;700;800&display=swap');
+
+/* Ethereal Slate Design System from Stitch */
 
 :root {
-  // Brand Colors — refined amber gold palette
-  --primary-hsl: 38, 92%, 60%;
-  --primary: hsl(var(--primary-hsl));
-  --primary-hover: hsl(38, 92%, 50%);
-  --primary-subtle: hsla(var(--primary-hsl), 0.08);
-  --secondary-hsl: 28, 90%, 55%;
-  --secondary: hsl(var(--secondary-hsl));
-  --accent: hsl(38, 92%, 60%);
+  // Brand Colors — Ethereal Slate palette
+  --primary: #ff6b6b; // Rich Coral
+  --primary-hover: #ff5252;
+  --primary-subtle: rgba(255, 107, 107, 0.08);
+  --secondary: #6c63ff; // Soft Indigo
+  --secondary-hover: #564eff;
+  --accent: #4ecdc4; // Mint Green / Tertiary
 
   // Semantic Colors
-  --success: #10b981;
+  --success: #4ecdc4; // Mint Green
   --warning: #f59e0b;
-  --danger: #ef4444;
+  --danger: #ffb4ab;
 
-  // Dark Theme Palette — warm charcoal & premium slate
-  --bg-dark-hsl: 220, 13%, 100%;
-  --bg-dark: hsl(var(--bg-dark-hsl));
-  --bg-deep: hsl(220, 15%, 4%);
+  // Dark Theme Palette — Deep Slate
+  --bg-dark: #12141d;
+  --bg-deep: #11131c;
 
-  --surface-hsl: 220, 10%, 11%;
-  --surface: hsl(var(--surface-hsl));
-  --surface-card: rgba(18, 18, 22, 0.72);
-  --surface-card-hover: rgba(26, 26, 32, 0.82);
-  --surface-elevated: rgba(32, 32, 40, 0.9);
+  --surface: #1c1f2b;
+  --surface-card: rgba(28, 31, 43, 0.72);
+  --surface-card-hover: rgba(37, 41, 57, 0.85);
+  --surface-elevated: #252936;
 
-  --border: rgba(255, 255, 255, 0.05);
-  --border-focus: rgba(212, 168, 83, 0.45);
-  --border-hover: rgba(255, 255, 255, 0.10);
+  --border: #2d313f;
+  --border-focus: #ff6b6b;
+  --border-hover: #3f4459;
 
   // Typography
-  --font-heading: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-heading: 'Sora', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-body: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
-  // Text Colors (Warm Tone Off-whites & Grays)
-  --text-primary: #f0ece4;
-  --text-secondary: #a39f96;
-  --text-muted: #6e6b64;
+  // Text Colors (Ethereal Slate tones)
+  --text-primary: #e1e1ef;
+  --text-secondary: #e0bfbd;
+  --text-muted: #717994;
 
   // Transitions
   --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
@@ -46,11 +45,11 @@
 
   // Shadows & Radii
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.45);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
-  --shadow-xl: 0 16px 56px rgba(0, 0, 0, 0.6);
-  --radius-sm: 8px;
-  --radius-md: 12px;
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.4);
+  --shadow-xl: 0 16px 56px rgba(0, 0, 0, 0.5);
+  --radius-sm: 4px;
+  --radius-md: 8px; // base roundness 8px
   --radius-lg: 16px;
   --radius-full: 9999px;
 }
@@ -71,7 +70,7 @@ html {
 body {
   font-family: var(--font-body);
   color: var(--text-primary);
-  background: radial-gradient(circle at 50% 0%, hsl(220, 12%, 10%) 0%, var(--bg-deep) 100%);
+  background: radial-gradient(circle at 50% 0%, var(--surface) 0%, var(--bg-deep) 100%);
   background-attachment: fixed;
   min-height: 100vh;
   line-height: 1.6;
