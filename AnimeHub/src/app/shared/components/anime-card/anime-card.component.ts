@@ -78,15 +78,12 @@ import { WatchlistService } from '../../../core/services/watchlist.service';
       position: relative;
 
       &:hover {
-        transform: translateY(-6px);
+        transform: translateY(-4px);
         border-color: var(--border-hover);
         box-shadow: var(--shadow-lg);
 
         .poster-overlay {
           opacity: 1;
-        }
-        .poster {
-          transform: scale(1.05);
         }
       }
     }
@@ -102,13 +99,12 @@ import { WatchlistService } from '../../../core/services/watchlist.service';
       width: 100%;
       height: 100%;
       object-fit: cover;
-      transition: transform 0.4s ease;
     }
 
     .poster-overlay {
       position: absolute;
       inset: 0;
-      background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 50%);
+      background: linear-gradient(to top, rgba(15, 23, 42, 0.8) 0%, transparent 50%);
       opacity: 0;
       transition: var(--transition-normal);
       display: flex;
@@ -131,14 +127,14 @@ import { WatchlistService } from '../../../core/services/watchlist.service';
       align-items: center;
       gap: 0.2rem;
       padding: 0.25rem 0.55rem;
-      background: rgba(0, 0, 0, 0.65);
+      background: rgba(15, 23, 42, 0.7);
       backdrop-filter: blur(8px);
       border-radius: var(--radius-sm);
       font-size: 0.8rem;
       font-weight: 700;
       font-family: var(--font-heading);
       color: var(--primary);
-      border: 1px solid rgba(212, 168, 83, 0.2);
+      border: 1px solid rgba(255, 107, 107, 0.15);
     }
 
     .airing-badge {
@@ -149,7 +145,7 @@ import { WatchlistService } from '../../../core/services/watchlist.service';
       align-items: center;
       gap: 0.35rem;
       padding: 0.25rem 0.55rem;
-      background: rgba(0, 230, 118, 0.15);
+      background: rgba(15, 118, 110, 0.15);
       backdrop-filter: blur(8px);
       border-radius: var(--radius-sm);
       font-size: 0.65rem;
@@ -157,7 +153,7 @@ import { WatchlistService } from '../../../core/services/watchlist.service';
       text-transform: uppercase;
       letter-spacing: 0.06em;
       color: var(--success);
-      border: 1px solid rgba(0, 230, 118, 0.25);
+      border: 1px solid rgba(15, 118, 110, 0.25);
     }
 
     .pulse-dot {
@@ -190,7 +186,7 @@ import { WatchlistService } from '../../../core/services/watchlist.service';
       font-size: 0.9rem;
       font-weight: 600;
       line-height: 1.35;
-      color: #fff;
+      color: var(--text-primary);
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
@@ -208,7 +204,7 @@ import { WatchlistService } from '../../../core/services/watchlist.service';
     .type-tag {
       padding: 0.1rem 0.4rem;
       background: var(--primary-subtle);
-      border: 1px solid rgba(212, 168, 83, 0.2);
+      border: 1px solid rgba(255, 107, 107, 0.15);
       border-radius: 4px;
       color: var(--primary);
       font-weight: 600;

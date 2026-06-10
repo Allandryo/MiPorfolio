@@ -106,7 +106,7 @@ import { AuthModalComponent } from '../auth-modal/auth-modal.component';
       top: 0;
       left: 0;
       right: 0;
-      z-index: 1000;
+      z-index: 100;
       border-bottom: 1px solid var(--border);
       border-radius: 0;
     }
@@ -170,14 +170,14 @@ import { AuthModalComponent } from '../auth-modal/auth-modal.component';
       }
 
       &:hover {
-        color: #fff;
-        background: rgba(255, 255, 255, 0.05);
+        color: var(--primary);
+        background: rgba(0, 0, 0, 0.04);
       }
 
       &.active {
-        color: #fff;
+        color: var(--primary);
         background: var(--primary-subtle);
-        border: 1px solid rgba(255, 107, 107, 0.2);
+        border: 1px solid rgba(255, 107, 107, 0.15);
 
         .material-symbols-outlined {
           color: var(--primary);
@@ -196,7 +196,7 @@ import { AuthModalComponent } from '../auth-modal/auth-modal.component';
       border-radius: var(--radius-full);
       font-size: 0.65rem;
       font-weight: 700;
-      color: #0b0d11;
+      color: #fff;
     }
 
     .auth-wrapper {
@@ -247,15 +247,15 @@ import { AuthModalComponent } from '../auth-modal/auth-modal.component';
       top: 50px;
       right: 0;
       width: 220px;
-      background: #1c1f2b;
+      background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius-md);
       box-shadow: var(--shadow-lg);
       padding: 0.5rem 0;
-      z-index: 1001;
+      z-index: 1050;
       display: flex;
       flex-direction: column;
-      animation: dropdownFadeIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      animation: dropdownFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     @keyframes dropdownFadeIn {
@@ -278,7 +278,7 @@ import { AuthModalComponent } from '../auth-modal/auth-modal.component';
         font-family: var(--font-heading);
         font-weight: 600;
         font-size: 0.9rem;
-        color: #fff;
+        color: var(--text-primary);
       }
 
       .user-email {
@@ -313,16 +313,16 @@ import { AuthModalComponent } from '../auth-modal/auth-modal.component';
       }
 
       &:hover {
-        background: rgba(255, 255, 255, 0.05);
-        color: #fff;
+        background: rgba(0, 0, 0, 0.04);
+        color: var(--primary);
       }
 
       &.logout {
         color: var(--danger);
 
         &:hover {
-          background: rgba(255, 180, 171, 0.05);
-          color: #ffb4ab;
+          background: rgba(229, 62, 62, 0.05);
+          color: var(--danger);
         }
       }
     }
@@ -343,7 +343,7 @@ import { AuthModalComponent } from '../auth-modal/auth-modal.component';
       border-radius: var(--radius-sm);
 
       &:hover {
-        background: rgba(255, 255, 255, 0.05);
+        background: rgba(0, 0, 0, 0.04);
       }
     }
 
@@ -362,14 +362,14 @@ import { AuthModalComponent } from '../auth-modal/auth-modal.component';
         left: 0;
         right: 0;
         flex-direction: column;
-        background: rgba(10, 10, 12, 0.96);
+        background: rgba(248, 250, 252, 0.98);
         backdrop-filter: blur(20px);
         border-bottom: 1px solid var(--border);
         padding: 1.5rem 1rem;
         gap: 0.35rem;
         transform: translateY(-120%);
-        transition: transform 0.3s ease;
-        z-index: 999;
+        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        z-index: 101;
 
         &.open {
           transform: translateY(0);
@@ -406,8 +406,8 @@ import { AuthModalComponent } from '../auth-modal/auth-modal.component';
         position: fixed;
         inset: 0;
         top: 64px;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 998;
+        background: rgba(15, 23, 42, 0.3);
+        z-index: 102;
       }
     }
   `]

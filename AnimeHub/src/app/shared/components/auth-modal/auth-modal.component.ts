@@ -164,9 +164,9 @@ import { SupabaseService } from '../../../core/services/supabase.service';
     .modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(8, 9, 13, 0.85);
+      background: rgba(15, 23, 42, 0.4);
       backdrop-filter: blur(8px);
-      z-index: 10000;
+      z-index: 1000;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -179,8 +179,8 @@ import { SupabaseService } from '../../../core/services/supabase.service';
       padding: 2.25rem 2rem;
       border-radius: var(--radius-lg);
       position: relative;
-      background: #1c1f2b;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      background: var(--surface);
+      box-shadow: var(--shadow-xl);
       border: 1px solid var(--border);
       animation: modalFadeIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
@@ -212,8 +212,8 @@ import { SupabaseService } from '../../../core/services/supabase.service';
       transition: var(--transition-fast);
 
       &:hover {
-        color: #fff;
-        background: rgba(255, 255, 255, 0.05);
+        color: var(--text-primary);
+        background: rgba(0, 0, 0, 0.05);
       }
     }
 
@@ -291,9 +291,9 @@ import { SupabaseService } from '../../../core/services/supabase.service';
     }
 
     .error-banner {
-      background: rgba(255, 180, 171, 0.1);
-      border: 1px solid rgba(255, 180, 171, 0.25);
-      color: #ffb4ab;
+      background: rgba(229, 62, 62, 0.08);
+      border: 1px solid rgba(229, 62, 62, 0.25);
+      color: var(--danger);
       padding: 0.75rem 1rem;
       border-radius: var(--radius-md);
       font-size: 0.85rem;
@@ -308,7 +308,7 @@ import { SupabaseService } from '../../../core/services/supabase.service';
     }
 
     .validation-error {
-      color: #ffb4ab;
+      color: var(--danger);
       font-size: 0.75rem;
       margin-top: 0.2rem;
     }

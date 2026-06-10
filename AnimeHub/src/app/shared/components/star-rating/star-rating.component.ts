@@ -34,7 +34,7 @@ import { CommonModule } from '@angular/common';
       font-variation-settings: 'FILL' 1, 'wght' 400;
       
       &.empty {
-        color: rgba(255, 255, 255, 0.2);
+        color: rgba(15, 23, 42, 0.12);
         font-variation-settings: 'FILL' 0;
       }
       &.half {
@@ -44,7 +44,7 @@ import { CommonModule } from '@angular/common';
     .score-number {
       margin-left: 0.35rem;
       font-weight: 700;
-      color: #fff;
+      color: var(--text-primary);
       font-family: var(--font-heading);
     }
     .no-score {

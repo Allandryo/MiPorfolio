@@ -251,7 +251,7 @@ import { StatusBadgeComponent } from '../../shared/components/status-badge/statu
     .banner-overlay {
       position: absolute;
       inset: 0;
-      background: linear-gradient(to top, var(--bg-deep) 0%, transparent 40%, transparent 60%, rgba(0,0,0,0.3) 100%);
+      background: linear-gradient(to top, var(--bg-deep) 0%, transparent 40%, transparent 60%, rgba(15, 23, 42, 0.3) 100%);
     }
 
     .main-section {
@@ -284,7 +284,7 @@ import { StatusBadgeComponent } from '../../shared/components/status-badge/statu
     .poster {
       width: 100%;
       border-radius: var(--radius-lg);
-      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6);
+      box-shadow: 0 16px 48px rgba(15, 23, 42, 0.15);
       border: 2px solid var(--border);
     }
 
@@ -328,7 +328,7 @@ import { StatusBadgeComponent } from '../../shared/components/status-badge/statu
       font-size: 0.75rem;
       font-weight: 600;
       color: var(--text-secondary);
-      background: rgba(255, 255, 255, 0.05);
+      background: rgba(0, 0, 0, 0.03);
       border: 1px solid var(--border);
       border-radius: var(--radius-sm);
     }
@@ -340,19 +340,19 @@ import { StatusBadgeComponent } from '../../shared/components/status-badge/statu
     }
 
     .genre-tag {
-    padding: 0.35rem 0.75rem;
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--primary);
-    background: var(--primary-subtle);
-    border: 1px solid rgba(212, 168, 83, 0.2);
-    border-radius: var(--radius-sm);
-    transition: var(--transition-fast);
+      padding: 0.35rem 0.75rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--primary);
+      background: var(--primary-subtle);
+      border: 1px solid rgba(255, 107, 107, 0.15);
+      border-radius: var(--radius-sm);
+      transition: var(--transition-fast);
 
-    &:hover {
-      background: rgba(212, 168, 83, 0.15);
+      &:hover {
+        background: rgba(255, 107, 107, 0.15);
+      }
     }
-  }
 
     .synopsis {
       h3 {
@@ -366,6 +366,7 @@ import { StatusBadgeComponent } from '../../shared/components/status-badge/statu
         color: var(--text-secondary);
         font-size: 0.95rem;
         line-height: 1.7;
+        text-wrap: pretty;
       }
     }
 
@@ -416,7 +417,7 @@ import { StatusBadgeComponent } from '../../shared/components/status-badge/statu
       justify-content: center;
       width: 2rem;
       height: 2rem;
-      background: rgba(255, 255, 255, 0.06);
+      background: rgba(0, 0, 0, 0.04);
       border: 1px solid var(--border);
       border-radius: var(--radius-sm);
       color: var(--text-primary);
@@ -424,7 +425,7 @@ import { StatusBadgeComponent } from '../../shared/components/status-badge/statu
       transition: var(--transition-fast);
 
       &:hover:not(:disabled) {
-        background: rgba(255, 255, 255, 0.12);
+        background: rgba(0, 0, 0, 0.08);
         border-color: var(--border-hover);
       }
 
@@ -460,12 +461,12 @@ import { StatusBadgeComponent } from '../../shared/components/status-badge/statu
 
     .btn-remove {
       color: var(--danger);
-      border-color: rgba(255, 23, 68, 0.2);
+      border-color: rgba(229, 62, 62, 0.2);
       padding: 0.5rem;
 
       &:hover {
-        background: rgba(255, 23, 68, 0.1);
-        border-color: rgba(255, 23, 68, 0.3);
+        background: rgba(229, 62, 62, 0.08);
+        border-color: rgba(229, 62, 62, 0.3);
       }
     }
 

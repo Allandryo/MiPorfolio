@@ -445,7 +445,7 @@ interface SectionData {
       background: transparent !important;
       padding: 0.85rem 0.5rem !important;
       font-size: 1.05rem;
-      color: #fff;
+      color: var(--text-primary);
       outline: none !important;
       box-shadow: none !important;
 
@@ -462,15 +462,15 @@ interface SectionData {
       height: 36px;
       border-radius: 50%;
       border: none;
-      background: rgba(255, 255, 255, 0.06);
+      background: rgba(0, 0, 0, 0.05);
       color: var(--text-secondary);
       cursor: pointer;
       transition: var(--transition-fast);
       flex-shrink: 0;
 
       &:hover {
-        background: rgba(255, 255, 255, 0.12);
-        color: #fff;
+        background: rgba(0, 0, 0, 0.1);
+        color: var(--text-primary);
       }
     }
 
@@ -575,7 +575,7 @@ interface SectionData {
       width: 44px;
       height: 44px;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.04);
+      background: rgba(0, 0, 0, 0.03);
       border: 1px solid var(--border);
       color: var(--text-primary);
       cursor: pointer;
@@ -584,6 +584,7 @@ interface SectionData {
       &:hover:not(:disabled) {
         background: var(--primary);
         border-color: var(--primary);
+        color: #0b0d11;
         box-shadow: var(--shadow-lg);
       }
 
@@ -626,8 +627,8 @@ interface SectionData {
       align-items: center;
       gap: 0.5rem;
       padding: 1rem;
-      background: rgba(255, 23, 68, 0.08);
-      border: 1px solid rgba(255, 23, 68, 0.2);
+      background: rgba(229, 62, 62, 0.08);
+      border: 1px solid rgba(229, 62, 62, 0.2);
       border-radius: var(--radius-md);
       color: var(--danger);
       font-size: 0.9rem;
@@ -695,7 +696,7 @@ interface SectionData {
       font-family: var(--font-body);
 
       &:hover {
-        color: #fff;
+        color: var(--primary);
       }
     }
 
@@ -722,7 +723,7 @@ interface SectionData {
       transition: var(--transition-fast);
 
       &:hover {
-        background: rgba(255, 255, 255, 0.03);
+        background: rgba(0, 0, 0, 0.02);
       }
     }
 
@@ -772,7 +773,7 @@ interface SectionData {
       font-family: var(--font-body);
       border-radius: var(--radius-sm);
       border: 1px solid var(--border);
-      background: rgba(255, 255, 255, 0.03);
+      background: rgba(0, 0, 0, 0.02);
       color: var(--text-secondary);
       cursor: pointer;
       transition: var(--transition-fast);
@@ -781,7 +782,7 @@ interface SectionData {
       &:hover {
         border-color: var(--border-hover);
         color: var(--text-primary);
-        background: rgba(255, 255, 255, 0.06);
+        background: rgba(0, 0, 0, 0.05);
       }
 
       &.active {
@@ -806,7 +807,7 @@ interface SectionData {
     .filter-select {
       width: 100%;
       appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
       background-repeat: no-repeat;
       background-position: right 0.75rem center;
       padding-right: 2.25rem !important;
@@ -814,8 +815,8 @@ interface SectionData {
       font-size: 0.85rem;
 
       option {
-        background: #121216;
-        color: #fff;
+        background: var(--surface);
+        color: var(--text-primary);
       }
     }
 
@@ -867,7 +868,7 @@ interface SectionData {
       height: 80px;
       border-radius: 50%;
       background: var(--primary-subtle);
-      border: 1px solid rgba(212, 168, 83, 0.25);
+      border: 1px solid rgba(255, 107, 107, 0.25);
       display: flex;
       align-items: center;
       justify-content: center;

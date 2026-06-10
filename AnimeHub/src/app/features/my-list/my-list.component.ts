@@ -290,7 +290,7 @@ interface Tab {
     }
 
     .clear-btn {
-      background: rgba(255, 255, 255, 0.06);
+      background: rgba(0, 0, 0, 0.04);
       border: none;
       border-radius: var(--radius-sm);
       padding: 0.35rem;
@@ -302,7 +302,7 @@ interface Tab {
       transition: var(--transition-fast);
     }
     .clear-btn:hover {
-      background: rgba(255, 255, 255, 0.12);
+      background: rgba(0, 0, 0, 0.08);
       color: var(--text-primary);
     }
     .clear-btn .material-symbols-outlined {
@@ -339,12 +339,12 @@ interface Tab {
     }
     .tab-btn:hover {
       color: var(--text-primary);
-      background: rgba(255, 255, 255, 0.04);
+      background: rgba(0, 0, 0, 0.03);
     }
     .tab-btn.active {
       background: var(--primary-subtle);
-      border: 1px solid rgba(212, 168, 83, 0.25);
-      color: #fff;
+      border: 1px solid rgba(255, 107, 107, 0.15);
+      color: var(--primary);
     }
     .tab-btn.active .tab-icon {
       color: var(--primary);
@@ -364,7 +364,7 @@ interface Tab {
       font-weight: 700;
       padding: 0.15rem 0.5rem;
       border-radius: var(--radius-full, 9999px);
-      background: rgba(255, 255, 255, 0.08);
+      background: rgba(0, 0, 0, 0.04);
       color: var(--text-muted);
       min-width: 1.5rem;
       text-align: center;
@@ -460,7 +460,7 @@ interface Tab {
     .poster-overlay {
       position: absolute;
       inset: 0;
-      background: rgba(212, 168, 83, 0.25);
+      background: rgba(255, 107, 107, 0.15);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -552,7 +552,7 @@ interface Tab {
     .progress-track {
       width: 100%;
       height: 6px;
-      background: rgba(255, 255, 255, 0.06);
+      background: rgba(0, 0, 0, 0.06);
       border-radius: var(--radius-full, 9999px);
       overflow: hidden;
     }
@@ -629,8 +629,8 @@ interface Tab {
       font-size: 1rem;
     }
     .action-btn.danger:hover {
-      border-color: rgba(255, 23, 68, 0.4);
-      background: rgba(255, 23, 68, 0.1);
+      border-color: rgba(229, 62, 62, 0.4);
+      background: rgba(229, 62, 62, 0.08);
       color: var(--danger);
     }
 
@@ -677,7 +677,7 @@ interface Tab {
       text-align: left;
     }
     .dropdown-option:hover {
-      background: rgba(255, 255, 255, 0.06);
+      background: rgba(0, 0, 0, 0.04);
       color: var(--text-primary);
     }
     .dropdown-option.current {
@@ -697,7 +697,7 @@ interface Tab {
     .modal-backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.7);
+      background: rgba(15, 23, 42, 0.4);
       backdrop-filter: blur(6px);
       display: flex;
       align-items: center;
@@ -730,7 +730,7 @@ interface Tab {
       width: 64px;
       height: 64px;
       border-radius: 50%;
-      background: rgba(255, 23, 68, 0.12);
+      background: rgba(229, 62, 62, 0.12);
       display: flex;
       align-items: center;
       justify-content: center;

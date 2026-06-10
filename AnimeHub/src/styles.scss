@@ -3,51 +3,51 @@
 /* Ethereal Slate Design System from Stitch */
 
 :root {
-  // Brand Colors — Ethereal Slate palette
+  // Brand Colors — Ethereal Slate Light palette
   --primary: #ff6b6b; // Rich Coral
-  --primary-hover: #ff5252;
+  --primary-hover: #e05353;
   --primary-subtle: rgba(255, 107, 107, 0.08);
   --secondary: #6c63ff; // Soft Indigo
   --secondary-hover: #564eff;
   --accent: #4ecdc4; // Mint Green / Tertiary
 
   // Semantic Colors
-  --success: #4ecdc4; // Mint Green
+  --success: #0f766e; // Teal-700
   --warning: #f59e0b;
-  --danger: #ffb4ab;
+  --danger: #e53e3e;
 
-  // Dark Theme Palette — Deep Slate
-  --bg-dark: #12141d;
-  --bg-deep: #11131c;
+  // Light Theme Palette — Light Ethereal Slate
+  --bg-dark: #f1f5f9; // slate-100
+  --bg-deep: #f8fafc; // slate-50
 
-  --surface: #1c1f2b;
-  --surface-card: rgba(28, 31, 43, 0.72);
-  --surface-card-hover: rgba(37, 41, 57, 0.85);
-  --surface-elevated: #252936;
+  --surface: #ffffff;
+  --surface-card: rgba(255, 255, 255, 0.8);
+  --surface-card-hover: rgba(255, 255, 255, 0.95);
+  --surface-elevated: #fdfcf9;
 
-  --border: #2d313f;
+  --border: #e2e8f0; // slate-200
   --border-focus: #ff6b6b;
-  --border-hover: #3f4459;
+  --border-hover: #cbd5e1; // slate-300
 
   // Typography
   --font-heading: 'Sora', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-body: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
-  // Text Colors (Ethereal Slate tones)
-  --text-primary: #e1e1ef;
-  --text-secondary: #e0bfbd;
-  --text-muted: #717994;
+  // Text Colors (Light Ethereal Slate tones)
+  --text-primary: #0f172a; // slate-900
+  --text-secondary: #475569; // slate-600
+  --text-muted: #64748b; // slate-500
 
   // Transitions
-  --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-normal: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-fast: 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-normal: 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   --transition-spring: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 
   // Shadows & Radii
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.3);
-  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.4);
-  --shadow-xl: 0 16px 56px rgba(0, 0, 0, 0.5);
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
+  --shadow-md: 0 8px 24px rgba(15, 23, 42, 0.05);
+  --shadow-lg: 0 12px 32px rgba(15, 23, 42, 0.08);
+  --shadow-xl: 0 16px 56px rgba(15, 23, 42, 0.12);
   --radius-sm: 4px;
   --radius-md: 8px; // base roundness 8px
   --radius-lg: 16px;
@@ -87,10 +87,10 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(212, 168, 83, 0.08);
+  background: rgba(15, 23, 42, 0.08);
   border-radius: var(--radius-full);
   &:hover {
-    background: rgba(212, 168, 83, 0.2);
+    background: rgba(15, 23, 42, 0.2);
   }
 }
 
@@ -99,8 +99,9 @@ h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
   font-weight: 700;
   line-height: 1.25;
-  color: #fff;
+  color: var(--text-primary);
   letter-spacing: -0.02em;
+  text-wrap: balance;
 }
 
 a {
@@ -188,8 +189,8 @@ a {
   }
 
   &:disabled {
-    background: var(--text-muted);
-    color: var(--text-secondary);
+    background: var(--border);
+    color: var(--text-muted);
     box-shadow: none;
     cursor: not-allowed;
     transform: none;
@@ -208,7 +209,7 @@ a {
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(0, 0, 0, 0.02);
   border: 1px solid var(--border);
   color: var(--text-primary);
   border-radius: var(--radius-md);
@@ -218,13 +219,13 @@ a {
   font-size: 0.9rem;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(212, 168, 83, 0.3);
-    color: #fff;
+    background: rgba(0, 0, 0, 0.05);
+    border-color: rgba(255, 107, 107, 0.3);
+    color: var(--primary);
   }
 
   &:active {
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(0, 0, 0, 0.08);
   }
 }
 
@@ -235,7 +236,7 @@ a {
 
 // Text utilities
 .text-gradient {
-  background: linear-gradient(135deg, #fff 30%, var(--primary) 100%);
+  background: linear-gradient(135deg, var(--text-primary) 30%, var(--primary) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -248,11 +249,11 @@ a {
 
 // Forms
 .input-glass {
-  background: rgba(10, 10, 12, 0.6);
+  background: rgba(255, 255, 255, 0.75);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: 0.75rem 1rem;
-  color: #fff;
+  color: var(--text-primary);
   font-family: var(--font-body);
   font-size: 0.95rem;
   transition: var(--transition-normal);
@@ -265,7 +266,7 @@ a {
   &:focus {
     border-color: var(--border-focus);
     box-shadow: 0 0 0 2px var(--primary-subtle);
-    background: rgba(10, 10, 12, 0.85);
+    background: #fff;
   }
 }
 
@@ -288,9 +289,9 @@ a {
 .shimmer {
   background: linear-gradient(
     90deg,
-    rgba(255, 255, 255, 0.02) 25%,
-    rgba(255, 255, 255, 0.05) 37%,
-    rgba(255, 255, 255, 0.02) 63%
+    rgba(15, 23, 42, 0.03) 25%,
+    rgba(15, 23, 42, 0.08) 37%,
+    rgba(15, 23, 42, 0.03) 63%
   );
   background-size: 400% 100%;
   animation: shimmer 1.4s ease infinite;
@@ -316,25 +317,25 @@ a {
   text-transform: uppercase;
   letter-spacing: 0.05em;
   border-radius: var(--radius-sm);
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  background: rgba(15, 23, 42, 0.03);
+  border: 1px solid rgba(15, 23, 42, 0.04);
   color: var(--text-secondary);
 
   &.badge-primary {
     background: var(--primary-subtle);
-    border-color: rgba(212, 168, 83, 0.15);
+    border-color: rgba(255, 107, 107, 0.15);
     color: var(--primary);
   }
 
   &.badge-secondary {
-    background: rgba(212, 168, 83, 0.06);
-    border-color: rgba(212, 168, 83, 0.12);
+    background: rgba(255, 107, 107, 0.06);
+    border-color: rgba(255, 107, 107, 0.12);
     color: var(--primary);
   }
 
   &.badge-success {
-    background: rgba(16, 185, 129, 0.08);
-    border-color: rgba(16, 185, 129, 0.16);
+    background: rgba(15, 118, 110, 0.08);
+    border-color: rgba(15, 118, 110, 0.16);
     color: var(--success);
   }
 
