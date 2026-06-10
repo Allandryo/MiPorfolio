@@ -105,7 +105,7 @@ import { StatusBadgeComponent } from '../../shared/components/status-badge/statu
             <div class="watchlist-actions">
               @if (!watchlistItem()) {
                 <div class="add-buttons">
-                  <button class="btn-gradient" (click)="addToWatchlist(AnimeStatus.WATCHING)">
+                  <button class="btn-primary" (click)="addToWatchlist(AnimeStatus.WATCHING)">
                     <span class="material-symbols-outlined">play_circle</span>
                     Viendo
                   </button>
@@ -134,7 +134,7 @@ import { StatusBadgeComponent } from '../../shared/components/status-badge/statu
                     </div>
                   </div>
                   <div class="status-actions">
-                    <select class="input-glass status-select" [value]="watchlistItem()!.status" (change)="onStatusChange($event)">
+                    <select class="select-field status-select" [value]="watchlistItem()!.status" (change)="onStatusChange($event)">
                       <option value="WATCHING">Viendo</option>
                       <option value="WATCHED">Visto</option>
                       <option value="PLAN_TO_WATCH">Por Ver</option>

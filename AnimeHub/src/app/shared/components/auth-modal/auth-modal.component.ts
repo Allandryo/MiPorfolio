@@ -50,13 +50,13 @@ import { SupabaseService } from '../../../core/services/supabase.service';
 
               <div class="form-group">
                 <label for="login-user">Usuario o Email</label>
-                <input 
-                  type="text" 
-                  id="login-user" 
-                  class="input-glass" 
-                  formControlName="emailOrUsername" 
-                  placeholder="ej. anime_fan o fan@mail.com"
-                  required>
+                  <input 
+                    type="text" 
+                    id="login-user" 
+                    class="input-field" 
+                    formControlName="emailOrUsername" 
+                    placeholder="ej. anime_fan o fan@mail.com"
+                    required>
               </div>
 
               <div class="form-group">
@@ -64,7 +64,7 @@ import { SupabaseService } from '../../../core/services/supabase.service';
                 <input 
                   type="password" 
                   id="login-pass" 
-                  class="input-glass" 
+                  class="input-field" 
                   formControlName="password" 
                   placeholder="••••••••"
                   required>
@@ -97,7 +97,7 @@ import { SupabaseService } from '../../../core/services/supabase.service';
                 <input 
                   type="text" 
                   id="reg-username" 
-                  class="input-glass" 
+                  class="input-field" 
                   formControlName="username" 
                   placeholder="ej. otaku_99">
                 @if (registerForm.get('username')?.touched && registerForm.get('username')?.invalid) {
@@ -112,7 +112,7 @@ import { SupabaseService } from '../../../core/services/supabase.service';
                 <input 
                   type="email" 
                   id="reg-email" 
-                  class="input-glass" 
+                  class="input-field" 
                   formControlName="email" 
                   placeholder="otaku@email.com">
                 @if (registerForm.get('email')?.touched && registerForm.get('email')?.invalid) {
@@ -125,7 +125,7 @@ import { SupabaseService } from '../../../core/services/supabase.service';
                 <input 
                   type="password" 
                   id="reg-pass" 
-                  class="input-glass" 
+                  class="input-field" 
                   formControlName="password" 
                   placeholder="••••••••">
                 @if (registerForm.get('password')?.touched && registerForm.get('password')?.invalid) {
@@ -140,7 +140,7 @@ import { SupabaseService } from '../../../core/services/supabase.service';
                 <input 
                   type="password" 
                   id="reg-confirm" 
-                  class="input-glass" 
+                  class="input-field" 
                   formControlName="confirmPassword" 
                   placeholder="••••••••">
                 @if (registerForm.get('confirmPassword')?.touched && registerForm.hasError('mismatch')) {

@@ -12,9 +12,9 @@ import { NavbarComponent } from './shared/components/navbar/navbar.component';
       <router-outlet />
     </main>
   `,
-  styles: [`
+    styles: [`
     .main-content {
-      padding-top: 64px;
+      padding-top: 5rem;
       min-height: 100vh;
     }
   `]

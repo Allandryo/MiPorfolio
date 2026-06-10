@@ -10,12 +10,12 @@ import { AuthModalComponent } from '../auth-modal/auth-modal.component';
   standalone: true,
   imports: [CommonModule, RouterLink, RouterLinkActive, AuthModalComponent],
   template: `
-    <nav class="navbar glass-panel">
+    <nav class="navbar surface-panel">
       <div class="navbar-inner container">
         <a routerLink="/" class="brand">
-          <span class="brand-icon material-symbols-outlined">movie_filter</span>
+          <span class="brand-icon material-symbols-outlined fill">movie_filter</span>
           <span class="brand-text">
-            <span class="text-gradient">Anime</span><span class="brand-accent">Hub</span>
+            <span class="brand-highlight">Anime</span><span class="brand-accent">Hub</span>
           </span>
         </a>
 
@@ -103,20 +103,40 @@ import { AuthModalComponent } from '../auth-modal/auth-modal.component';
   styles: [`
     .navbar {
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 100;
-      border-bottom: 1px solid var(--border);
-      border-radius: 0;
+      top: 0.75rem;
+      left: 0.75rem;
+      right: 0.75rem;
+      z-index: var(--z-sticky);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      max-width: 1400px;
+      margin: 0 auto;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      background: rgba(248, 250, 252, 0.85);
+      transition: var(--transition-normal);
+      box-shadow: var(--shadow-sm);
+
+      @media (max-width: 768px) {
+        top: 0;
+        left: 0;
+        right: 0;
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+      }
     }
 
     .navbar-inner {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      height: 64px;
+      height: 60px;
       gap: 2rem;
+
+      @media (max-width: 768px) {
+        height: 56px;
+      }
     }
 
     .brand {
@@ -125,23 +145,40 @@ import { AuthModalComponent } from '../auth-modal/auth-modal.component';
       gap: 0.6rem;
       text-decoration: none;
       flex-shrink: 0;
+      position: relative;
+
+      &::after {
+        content: '';
+        position: absolute;
+        inset: -0.5rem;
+        border-radius: var(--radius-md);
+        background: transparent;
+        transition: var(--transition-fast);
+      }
+
+      &:hover::after {
+        background: rgba(0, 0, 0, 0.03);
+      }
     }
 
     .brand-icon {
-      font-size: 1.75rem;
+      font-size: 1.65rem;
       color: var(--primary);
-      font-variation-settings: 'FILL' 1;
     }
 
     .brand-text {
       font-family: var(--font-heading);
-      font-size: 1.35rem;
+      font-size: 1.3rem;
       font-weight: 800;
       letter-spacing: -0.03em;
     }
 
+    .brand-highlight {
+      color: var(--primary);
+    }
+
     .brand-accent {
-      color: var(--text-secondary);
+      color: var(--text-primary);
       font-weight: 600;
     }
 
@@ -191,12 +228,13 @@ import { AuthModalComponent } from '../auth-modal/auth-modal.component';
       justify-content: center;
       min-width: 1.25rem;
       height: 1.25rem;
-      padding: 0 0.35rem;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      padding: 0 0.4rem;
+      background: var(--primary);
       border-radius: var(--radius-full);
       font-size: 0.65rem;
       font-weight: 700;
       color: #fff;
+      box-shadow: var(--shadow-sm);
     }
 
     .auth-wrapper {
@@ -246,26 +284,27 @@ import { AuthModalComponent } from '../auth-modal/auth-modal.component';
       position: absolute;
       top: 50px;
       right: 0;
-      width: 220px;
-      background: var(--surface);
+      width: 240px;
+      background: var(--surface-card);
       border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      box-shadow: var(--shadow-lg);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-xl);
       padding: 0.5rem 0;
-      z-index: 1050;
+      z-index: var(--z-dropdown);
       display: flex;
       flex-direction: column;
-      animation: dropdownFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      backdrop-filter: blur(20px);
+      animation: dropdownIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    @keyframes dropdownFadeIn {
+    @keyframes dropdownIn {
       from {
         opacity: 0;
-        transform: translateY(-5px);
+        transform: translateY(-6px) scale(0.96);
       }
       to {
         opacity: 1;
-        transform: translateY(0);
+        transform: translateY(0) scale(1);
       }
     }
 
@@ -368,11 +407,13 @@ import { AuthModalComponent } from '../auth-modal/auth-modal.component';
         padding: 1.5rem 1rem;
         gap: 0.35rem;
         transform: translateY(-120%);
-        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        z-index: 101;
+        transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
+        opacity: 0;
+        z-index: var(--z-mobile-nav);
 
         &.open {
           transform: translateY(0);
+          opacity: 1;
         }
 
         .nav-link {
@@ -399,15 +440,17 @@ import { AuthModalComponent } from '../auth-modal/auth-modal.component';
         left: 20px;
         right: 20px;
         width: calc(100% - 40px);
+        z-index: var(--z-dropdown);
       }
 
       .mobile-backdrop {
         display: block;
         position: fixed;
         inset: 0;
-        top: 64px;
+        top: 56px;
         background: rgba(15, 23, 42, 0.3);
-        z-index: 102;
+        backdrop-filter: blur(4px);
+        z-index: var(--z-mobile-backdrop);
       }
     }
   `]

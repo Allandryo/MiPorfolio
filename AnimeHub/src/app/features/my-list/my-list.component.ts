@@ -21,7 +21,7 @@ interface Tab {
         <!-- Header -->
         <div class="page-header">
           <div class="header-text">
-            <h1 class="text-gradient">Mi Lista</h1>
+            <h1 class="page-title">Mi Lista</h1>
             <p class="header-subtitle">Tu colección personal de anime</p>
           </div>
           <div class="header-stats">
@@ -33,10 +33,10 @@ interface Tab {
         </div>
 
         <!-- Search Bar -->
-        <div class="search-bar glass-panel">
+        <div class="search-bar surface-panel">
           <span class="material-symbols-outlined search-icon">search</span>
           <input
-            class="input-glass search-input"
+            class="input-field search-input"
             type="text"
             placeholder="Buscar en tu lista..."
             [ngModel]="searchQuery()"
@@ -81,7 +81,7 @@ interface Tab {
                 }
               </p>
               @if (!searchQuery()) {
-                <a routerLink="/" class="btn-gradient explore-btn">
+                <a routerLink="/" class="btn-primary explore-btn">
                   <span class="material-symbols-outlined">explore</span>
                   Explorar anime
                 </a>
@@ -205,7 +205,7 @@ interface Tab {
                 <span class="material-symbols-outlined">close</span>
                 Cancelar
               </button>
-              <button class="btn-gradient danger-btn" (click)="executeRemove()">
+              <button class="btn-primary danger-btn" (click)="executeRemove()">
                 <span class="material-symbols-outlined">delete</span>
                 Eliminar
               </button>
@@ -233,11 +233,16 @@ interface Tab {
       flex-wrap: wrap;
     }
 
-    .page-header h1 {
+    .page-title {
       font-family: var(--font-heading);
       font-size: 2.5rem;
       font-weight: 800;
       margin-bottom: 0.25rem;
+      color: var(--primary);
+
+      @media (max-width: 640px) {
+        font-size: 1.75rem;
+      }
     }
 
     .header-subtitle {
@@ -560,26 +565,9 @@ interface Tab {
     .progress-fill {
       height: 100%;
       border-radius: var(--radius-full, 9999px);
-      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      background: var(--primary);
       transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       position: relative;
-    }
-    .progress-fill::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(
-        90deg,
-        transparent 0%,
-        rgba(255, 255, 255, 0.25) 50%,
-        transparent 100%
-      );
-      animation: progressShine 2s ease-in-out infinite;
-    }
-
-    @keyframes progressShine {
-      0% { transform: translateX(-100%); }
-      100% { transform: translateX(100%); }
     }
 
     /* Episode Controls */

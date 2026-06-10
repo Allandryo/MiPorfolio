@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
-import { map, shareReplay, tap } from 'rxjs/operators';
+import { HttpClient, HttpParams, HttpErrorResponse } from '@angular/common/http';
+import { Observable, of, throwError, timer } from 'rxjs';
+import { map, shareReplay, tap, retryWhen, delayWhen, catchError, timeout } from 'rxjs/operators';
 
 export interface Anime {
   mal_id: number;
@@ -90,11 +90,21 @@ export class JikanService {
     const key = `${url}?${params?.toString() || ''}`;
     if (!this.cache.has(key)) {
       const request$ = this.http.get<T>(url, { params }).pipe(
-        shareReplay(1)
+        timeout(15000),
+        retryWhen(errors =>
+          errors.pipe(
+            delayWhen((err) => {
+              if (err instanceof HttpErrorResponse) {
+                if (err.status === 429) return timer(2000);
+                if (err.status >= 500) return timer(3000);
+              }
+              throw err;
+            }),
+          )
+        ),
+        shareReplay({ bufferSize: 1, refCount: true })
       );
       this.cache.set(key, request$);
-      
-      // Keep cache alive for 3 minutes, then clear it to allow fresh fetches
       setTimeout(() => this.cache.delete(key), 3 * 60 * 1000);
     }
     return this.cache.get(key) as Observable<T>;

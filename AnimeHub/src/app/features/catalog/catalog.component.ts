@@ -32,7 +32,7 @@ interface SectionData {
       <div class="container hero-content">
         <h1 class="hero-title">
           Descubre tu<br />
-          <span class="text-gradient">próximo anime favorito</span>
+          <span class="hero-highlight">próximo anime favorito</span>
         </h1>
         <p class="hero-subtitle">Explora, busca y organiza tu lista personal de animes</p>
         
@@ -129,7 +129,7 @@ interface SectionData {
               @if (scoreExpanded()) {
                 <div class="filter-body">
                   <select
-                    class="filter-select input-glass"
+                    class="filter-select select-field"
                     [ngModel]="selectedScore()"
                     (ngModelChange)="onScoreChange($event)"
                   >
@@ -159,7 +159,7 @@ interface SectionData {
               @if (yearExpanded()) {
                 <div class="filter-body">
                   <select
-                    class="filter-select input-glass"
+                    class="filter-select select-field"
                     [ngModel]="selectedYear()"
                     (ngModelChange)="onYearChange($event)"
                   >
@@ -189,7 +189,7 @@ interface SectionData {
               @if (seasonExpanded()) {
                 <div class="filter-body">
                   <select
-                    class="filter-select input-glass"
+                    class="filter-select select-field"
                     [ngModel]="selectedSeason()"
                     (ngModelChange)="onSeasonChange($event)"
                   >
@@ -219,7 +219,7 @@ interface SectionData {
               @if (statusExpanded()) {
                 <div class="filter-body">
                   <select
-                    class="filter-select input-glass"
+                    class="filter-select select-field"
                     [ngModel]="selectedStatus()"
                     (ngModelChange)="onStatusChange($event)"
                   >
@@ -283,7 +283,7 @@ interface SectionData {
             <!-- Load More -->
             @if (hasNextPage() && !loading() && results().length > 0) {
               <div class="load-more-wrapper">
-                <button class="btn-gradient load-more-btn" (click)="loadMore()">
+                <button class="btn-primary load-more-btn" (click)="loadMore()">
                   <span class="material-symbols-outlined">expand_more</span>
                   Cargar más
                 </button>
@@ -366,7 +366,7 @@ interface SectionData {
 
     <footer class="footer">
       <div class="container footer-inner">
-        <span class="text-gradient-primary">AnimeHub</span>
+        <span class="footer-brand">AnimeHub</span>
         <span class="footer-divider">•</span>
         <span>Datos proporcionados por <a href="https://jikan.moe" target="_blank" rel="noopener">Jikan API</a></span>
       </div>
@@ -375,17 +375,16 @@ interface SectionData {
   styles: [`
     .hero {
       position: relative;
-      padding: 5rem 0 4rem;
+      padding: 4rem 0 3rem;
       overflow: hidden;
-      text-align: center;
     }
 
     .hero-bg {
       position: absolute;
       inset: 0;
       background:
-        radial-gradient(ellipse at 20% 50%, hsla(var(--primary-hsl), 0.08) 0%, transparent 60%),
-        radial-gradient(ellipse at 80% 50%, hsla(var(--secondary-hsl), 0.06) 0%, transparent 60%);
+        radial-gradient(ellipse at 15% 50%, rgba(255, 107, 107, 0.07) 0%, transparent 60%),
+        radial-gradient(ellipse at 85% 50%, rgba(108, 99, 255, 0.05) 0%, transparent 60%);
       pointer-events: none;
     }
 
@@ -393,27 +392,32 @@ interface SectionData {
       position: relative;
       display: flex;
       flex-direction: column;
-      align-items: center;
       gap: 1.25rem;
+      max-width: 720px;
     }
 
     .hero-title {
-      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-size: clamp(2.2rem, 5vw, 3.75rem);
       font-weight: 800;
-      line-height: 1.15;
+      line-height: 1.12;
       letter-spacing: -0.03em;
+    }
+
+    .hero-highlight {
+      color: var(--primary);
     }
 
     .hero-subtitle {
       color: var(--text-secondary);
       font-size: 1.1rem;
       max-width: 480px;
+      line-height: 1.5;
     }
 
     /* ===== Search Bar ===== */
     .search-bar-wrapper {
       width: 100%;
-      max-width: 600px;
+      max-width: 560px;
       margin-top: 1.5rem;
     }
 
@@ -421,8 +425,8 @@ interface SectionData {
       display: flex;
       align-items: center;
       gap: 0.75rem;
-      padding: 0.35rem 0.5rem 0.35rem 1.25rem;
-      border-radius: var(--radius-lg);
+      padding: 0.25rem 0.35rem 0.25rem 1.25rem;
+      border-radius: var(--radius-xl);
       background: var(--surface-card);
       border: 1px solid var(--border);
       transition: var(--transition-normal);
@@ -435,7 +439,7 @@ interface SectionData {
 
     .search-icon {
       color: var(--text-muted);
-      font-size: 1.5rem;
+      font-size: 1.4rem;
       flex-shrink: 0;
     }
 
@@ -443,14 +447,15 @@ interface SectionData {
       flex: 1;
       border: none !important;
       background: transparent !important;
-      padding: 0.85rem 0.5rem !important;
-      font-size: 1.05rem;
+      padding: 0.75rem 0.5rem !important;
+      font-size: 1rem;
       color: var(--text-primary);
       outline: none !important;
       box-shadow: none !important;
 
       &::placeholder {
         color: var(--text-muted);
+        font-weight: 400;
       }
     }
 
@@ -458,11 +463,11 @@ interface SectionData {
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
+      width: 2.25rem;
+      height: 2.25rem;
+      border-radius: var(--radius-full);
       border: none;
-      background: rgba(0, 0, 0, 0.05);
+      background: rgba(0, 0, 0, 0.04);
       color: var(--text-secondary);
       cursor: pointer;
       transition: var(--transition-fast);
@@ -806,11 +811,6 @@ interface SectionData {
 
     .filter-select {
       width: 100%;
-      appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 0.75rem center;
-      padding-right: 2.25rem !important;
       cursor: pointer;
       font-size: 0.85rem;
 
@@ -939,6 +939,13 @@ interface SectionData {
       gap: 0.5rem;
       font-size: 0.85rem;
       color: var(--text-muted);
+      flex-wrap: wrap;
+    }
+
+    .footer-brand {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      color: var(--primary);
     }
 
     .footer-divider {
