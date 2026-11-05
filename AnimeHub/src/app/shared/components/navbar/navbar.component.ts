@@ -96,8 +96,8 @@ import { AuthModalComponent } from '../auth-modal/auth-modal.component';
       (change)="onAvatarSelected($event)">
 
     <!-- Auth modal overlay -->
-    @if (showAuthModal()) {
-      <app-auth-modal (close)="showAuthModal.set(false)"></app-auth-modal>
+    @if (supabaseService.authModalOpen()) {
+      <app-auth-modal (close)="supabaseService.closeAuthModal()"></app-auth-modal>
     }
   `,
   styles: [`
@@ -484,7 +484,7 @@ export class NavbarComponent {
   }
 
   openAuthModal() {
-    this.showAuthModal.set(true);
+    this.supabaseService.openAuthModal();
     this.closeMobile();
   }
 

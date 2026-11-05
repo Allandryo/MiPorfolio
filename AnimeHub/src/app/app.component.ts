@@ -6,17 +6,9 @@ import { NavbarComponent } from './shared/components/navbar/navbar.component';
   selector: 'app-root',
   standalone: true,
   imports: [RouterOutlet, NavbarComponent],
-  template: `
-    <app-navbar />
-    <main class="main-content">
-      <router-outlet />
-    </main>
-  `,
-    styles: [`
-    .main-content {
-      padding-top: 5rem;
-      min-height: 100vh;
-    }
-  `]
+  templateUrl: './app.component.html',
+  styleUrl: './app.component.scss'
 })
-export class AppComponent {}
+export class AppComponent {
+  title = 'AnimeHub';
+}

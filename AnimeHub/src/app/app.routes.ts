@@ -1,31 +1,11 @@
 import { Routes } from '@angular/router';
+import { CatalogComponent } from './features/catalog/catalog.component';
+import { DetailsComponent } from './features/details/details.component';
+import { MyListComponent } from './features/my-list/my-list.component';
 
 export const routes: Routes = [
-  {
-    path: '',
-    loadComponent: () =>
-      import('./features/catalog/catalog.component').then(m => m.CatalogComponent),
-    title: 'AnimeHub — Explora Anime'
-  },
-  {
-    path: 'search',
-    redirectTo: '',
-    pathMatch: 'full'
-  },
-  {
-    path: 'anime/:id',
-    loadComponent: () =>
-      import('./features/details/details.component').then(m => m.DetailsComponent),
-    title: 'AnimeHub — Detalles'
-  },
-  {
-    path: 'my-list',
-    loadComponent: () =>
-      import('./features/my-list/my-list.component').then(m => m.MyListComponent),
-    title: 'AnimeHub — Mi Lista'
-  },
-  {
-    path: '**',
-    redirectTo: ''
-  }
+  { path: '', component: CatalogComponent },
+  { path: 'anime/:id', component: DetailsComponent },
+  { path: 'my-list', component: MyListComponent },
+  { path: '**', redirectTo: '' }
 ];

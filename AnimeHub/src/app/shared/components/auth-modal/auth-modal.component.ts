@@ -403,7 +403,12 @@ export class AuthModalComponent {
 
     try {
       await this.supabaseService.signUp(username, email, password);
-      this.successMessage.set('¡Registro exitoso! Por favor revisa tu correo electrónico para verificar tu cuenta y activar tu sesión.');
+      if (this.supabaseService.isAuthenticated()) {
+        this.successMessage.set('¡Cuenta creada y sesión iniciada con éxito!');
+        setTimeout(() => this.close.emit(), 1200);
+      } else {
+        this.successMessage.set('¡Registro exitoso! Por favor revisa tu correo electrónico para verificar tu cuenta y activar tu sesión.');
+      }
     } catch (e: any) {
       console.error(e);
       this.error.set(e.message || 'Error al registrar usuario.');

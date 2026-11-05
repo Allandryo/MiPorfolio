@@ -1,7 +1,7 @@
 import { Component, Input, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { Anime } from '../../../core/services/jikan.service';
+import { Anime } from '../../../core/services/anilist.service';
 import { StatusBadgeComponent } from '../status-badge/status-badge.component';
 import { WatchlistService } from '../../../core/services/watchlist.service';
 

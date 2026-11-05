@@ -1,121 +1,138 @@
-import { Injectable, signal, computed, effect } from '@angular/core';
-import { Anime } from './jikan.service';
+import { Injectable, inject, signal, computed, effect } from '@angular/core';
+import { SupabaseService } from './supabase.service';
 
-export enum AnimeStatus {
-  WATCHING = 'WATCHING',
-  WATCHED = 'WATCHED',
-  PLAN_TO_WATCH = 'PLAN_TO_WATCH'
-}
+export type WatchStatus = 'watching' | 'watched' | 'plan_to_watch';
 
 export interface WatchlistItem {
-  animeId: number;
-  title: string;
-  imageUrl: string;
-  score?: number;
-  status: AnimeStatus;
-  watchedEpisodes: number;
-  totalEpisodes?: number;
-  updatedAt: string;
+  anime_id: number;
+  status: WatchStatus;
+  episodes_watched: number;
+  total_episodes: number | null;
+  anime_data: any; // Objeto del anime proveniente de AniList
 }
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class WatchlistService {
-  private STORAGE_KEY = 'anime_web_app_watchlist';
-
-  // Core reactive list using Signals
+  private supabaseService = inject(SupabaseService);
+  
+  // Signal principal de la lista
   private itemsSignal = signal<WatchlistItem[]>([]);
 
-  // Exposed read-only lists computed from the core list
-  items = computed(() => this.itemsSignal());
-  
-  watching = computed(() => this.itemsSignal().filter(item => item.status === AnimeStatus.WATCHING));
-  watched = computed(() => this.itemsSignal().filter(item => item.status === AnimeStatus.WATCHED));
-  planToWatch = computed(() => this.itemsSignal().filter(item => item.status === AnimeStatus.PLAN_TO_WATCH));
+  // Selectores Computed para las pestañas de /my-list
+  readonly allItems = this.itemsSignal.asReadonly();
+  readonly watchingList = computed(() => this.itemsSignal().filter(i => i.status === 'watching'));
+  readonly watchedList = computed(() => this.itemsSignal().filter(i => i.status === 'watched'));
+  readonly planToWatchList = computed(() => this.itemsSignal().filter(i => i.status === 'plan_to_watch'));
 
   constructor() {
-    // Load initial list from localStorage
-    const saved = localStorage.getItem(this.STORAGE_KEY);
-    if (saved) {
-      try {
-        this.itemsSignal.set(JSON.parse(saved));
-      } catch (e) {
-        console.error('Error loading watchlist from localStorage', e);
-      }
-    }
-
-    // Effect to automatically save state whenever list changes
+    // Recargar lista automáticamente cuando cambia el usuario o el modo
     effect(() => {
-      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.itemsSignal()));
+      const user = this.supabaseService.currentUser();
+      if (user) {
+        this.loadWatchlist(user.id);
+      } else {
+        this.loadFromLocal('guest');
+      }
     });
   }
 
-  getWatchlistItem(animeId: number): WatchlistItem | undefined {
-    return this.itemsSignal().find(item => item.animeId === animeId);
-  }
-
-  addToWatchlist(anime: Anime, status: AnimeStatus): void {
-    const existing = this.getWatchlistItem(anime.mal_id);
-    const now = new Date().toISOString();
-
-    if (existing) {
-      this.updateStatus(anime.mal_id, status);
+  async loadWatchlist(userId: string) {
+    if (this.supabaseService.isLocalMode() || !this.supabaseService.client) {
+      this.loadFromLocal(userId);
       return;
     }
 
+    const { data, error } = await this.supabaseService.client
+      .from('anime_lists')
+      .select('*')
+      .eq('user_id', userId)
+      .order('updated_at', { ascending: false });
+
+    if (!error && data) {
+      this.itemsSignal.set(data);
+    } else {
+      this.loadFromLocal(userId); // Fallback en caso de caída de red
+    }
+  }
+
+  async upsertAnime(anime: any, status: WatchStatus, episodesWatched = 0) {
+    const totalEpisodes = anime.episodes || null;
+    // Regla de negocio del README: si completa episodios -> cambia a 'watched'
+    const finalStatus: WatchStatus = (totalEpisodes && episodesWatched >= totalEpisodes) 
+      ? 'watched' 
+      : status;
+
     const newItem: WatchlistItem = {
-      animeId: anime.mal_id,
-      title: anime.title,
-      imageUrl: anime.images.webp?.image_url || anime.images.jpg.image_url,
-      score: anime.score,
-      status: status,
-      watchedEpisodes: status === AnimeStatus.WATCHED ? (anime.episodes || 0) : 0,
-      totalEpisodes: anime.episodes,
-      updatedAt: now
+      anime_id: anime.id,
+      status: finalStatus,
+      episodes_watched: episodesWatched,
+      total_episodes: totalEpisodes,
+      anime_data: anime
     };
 
-    this.itemsSignal.update(items => [newItem, ...items]);
+    // Actualización optimista en la UI con Signals
+    this.itemsSignal.update(list => {
+      const exists = list.some(i => i.anime_id === anime.id);
+      return exists 
+        ? list.map(i => i.anime_id === anime.id ? newItem : i)
+        : [newItem, ...list];
+    });
+
+    await this.persistItem(newItem);
   }
 
-  updateStatus(animeId: number, status: AnimeStatus): void {
-    const now = new Date().toISOString();
-    this.itemsSignal.update(items =>
-      items.map(item => {
-        if (item.animeId === animeId) {
-          const watchedEpisodes = status === AnimeStatus.WATCHED 
-            ? (item.totalEpisodes || item.watchedEpisodes) 
-            : item.watchedEpisodes;
-          return { ...item, status, watchedEpisodes, updatedAt: now };
-        }
-        return item;
-      })
-    );
+  async updateEpisodeProgress(animeId: number, delta: number) {
+    const item = this.itemsSignal().find(i => i.anime_id === animeId);
+    if (!item) return;
+
+    const maxEps = item.total_episodes ?? Infinity;
+    const newCount = Math.max(0, Math.min(item.episodes_watched + delta, maxEps));
+    
+    await this.upsertAnime(item.anime_data, item.status, newCount);
   }
 
-  updateProgress(animeId: number, episodes: number): void {
-    const now = new Date().toISOString();
-    this.itemsSignal.update(items =>
-      items.map(item => {
-        if (item.animeId === animeId) {
-          let status = item.status;
-          let watched = Math.max(0, episodes);
-          
-          if (item.totalEpisodes && watched >= item.totalEpisodes) {
-            watched = item.totalEpisodes;
-            status = AnimeStatus.WATCHED;
-          } else if (watched > 0 && status === AnimeStatus.PLAN_TO_WATCH) {
-            status = AnimeStatus.WATCHING;
-          }
-          
-          return { ...item, watchedEpisodes: watched, status, updatedAt: now };
-        }
-        return item;
-      })
-    );
+  async removeAnime(animeId: number) {
+    this.itemsSignal.update(list => list.filter(i => i.anime_id !== animeId));
+    
+    const user = this.supabaseService.currentUser();
+    if (!user || this.supabaseService.isLocalMode() || !this.supabaseService.client) {
+      this.saveToLocal(user?.id || 'guest');
+      return;
+    }
+
+    await this.supabaseService.client
+      .from('anime_lists')
+      .delete()
+      .eq('user_id', user.id)
+      .eq('anime_id', animeId);
   }
 
-  removeFromWatchlist(animeId: number): void {
-    this.itemsSignal.update(items => items.filter(item => item.animeId !== animeId));
+  private async persistItem(item: WatchlistItem) {
+    const user = this.supabaseService.currentUser();
+    if (!user || this.supabaseService.isLocalMode() || !this.supabaseService.client) {
+      this.saveToLocal(user?.id || 'guest');
+      return;
+    }
+
+    await this.supabaseService.client
+      .from('anime_lists')
+      .upsert({
+        user_id: user.id,
+        anime_id: item.anime_id,
+        status: item.status,
+        episodes_watched: item.episodes_watched,
+        total_episodes: item.total_episodes,
+        anime_data: item.anime_data,
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'user_id,anime_id' });
+  }
+
+  private loadFromLocal(key: string) {
+    const raw = localStorage.getItem(`animehub_list_${key}`);
+    this.itemsSignal.set(raw ? JSON.parse(raw) : []);
+  }
+
+  private saveToLocal(key: string) {
+    localStorage.setItem(`animehub_list_${key}`, JSON.stringify(this.itemsSignal()));
   }
 }

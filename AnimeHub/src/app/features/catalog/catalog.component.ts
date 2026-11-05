@@ -5,7 +5,7 @@ import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged, finalize } from 'rxjs/operators';
 
-import { JikanService, Anime } from '../../core/services/jikan.service';
+import { AnilistService, Anime } from '../../core/services/anilist.service';
 import { AnimeCardComponent } from '../../shared/components/anime-card/anime-card.component';
 import { SkeletonCardComponent } from '../../shared/components/skeleton-card/skeleton-card.component';
 
@@ -35,20 +35,20 @@ interface SectionData {
           <span class="hero-highlight">próximo anime favorito</span>
         </h1>
         <p class="hero-subtitle">Explora, busca y organiza tu lista personal de animes</p>
-        
-        <!-- Search bar in the hero -->
+
+        <!-- Barra de búsqueda -->
         <div class="search-bar-wrapper">
           <div class="search-bar surface-panel">
             <span class="material-symbols-outlined search-icon">search</span>
             <input
               type="text"
               class="search-input"
-              placeholder="explorar catalogo"
+              placeholder="Buscar anime por nombre..."
               [ngModel]="searchQuery()"
               (ngModelChange)="onSearchInput($event)"
             />
             @if (searchQuery()) {
-              <button class="clear-btn" (click)="clearSearch()">
+              <button class="clear-btn" (click)="clearSearch()" aria-label="Limpiar búsqueda">
                 <span class="material-symbols-outlined">close</span>
               </button>
             }
@@ -57,307 +57,274 @@ interface SectionData {
       </div>
     </section>
 
-    <!-- Main Content Area -->
+    <!-- Contenido Principal -->
     <div class="container main-content">
       <div class="catalog-layout">
-        <!-- Left Filters Sidebar -->
+        <!-- Barra lateral de filtros (Sin Temporada) -->
         <aside class="filters-sidebar">
-            <div class="filters-header">
-              <h3>
-                <span class="material-symbols-outlined">filter_list</span>
-                Filtros
-              </h3>
-              @if (activeFilterCount() > 0) {
-                <button class="clear-filters-btn" (click)="clearAllFilters()">
-                  <span class="material-symbols-outlined icon-sm">restart_alt</span>
-                  Limpiar
-                </button>
-              }
-            </div>
-
-            <!-- Genre Filter -->
-            <div class="filter-group">
-              <button class="filter-group-header" (click)="genresExpanded.set(!genresExpanded())">
-                <span class="filter-label">
-                  <span class="material-symbols-outlined icon-sm">category</span>
-                  Géneros
-                </span>
-                @if (selectedGenres().length > 0) {
-                  <span class="active-count">{{ selectedGenres().length }}</span>
-                }
-                <span class="material-symbols-outlined chevron" [class.rotated]="genresExpanded()">
-                  expand_more
-                </span>
+          <div class="filters-header">
+            <h3>
+              <span class="material-symbols-outlined">filter_list</span>
+              Filtros
+            </h3>
+            @if (activeFilterCount() > 0 || searchQuery().trim().length > 0) {
+              <button class="clear-filters-btn" (click)="clearAllFilters()">
+                <span class="material-symbols-outlined icon-sm">restart_alt</span>
+                Limpiar
               </button>
-              @if (genresExpanded()) {
-                <div class="filter-body genre-grid">
-                  @if (genres().length === 0) {
-                    <div class="genre-loading">
-                      @for (i of skeletonGenres; track i) {
-                        <div class="genre-skeleton shimmer"></div>
-                      }
-                    </div>
-                  } @else {
-                    @for (genre of genres(); track genre.mal_id) {
-                      <button
-                        class="genre-tag-btn"
-                        [class.active]="isGenreSelected(genre.mal_id)"
-                        (click)="toggleGenre(genre.mal_id)"
-                      >
-                        {{ genre.name }}
-                      </button>
+            }
+          </div>
+
+          <!-- Filtro de Géneros -->
+          <div class="filter-group">
+            <button class="filter-group-header" (click)="genresExpanded.set(!genresExpanded())">
+              <span class="filter-label">
+                <span class="material-symbols-outlined icon-sm">category</span>
+                Géneros
+              </span>
+              @if (selectedGenres().length > 0) {
+                <span class="active-count">{{ selectedGenres().length }}</span>
+              }
+              <span class="material-symbols-outlined chevron" [class.rotated]="genresExpanded()">
+                expand_more
+              </span>
+            </button>
+            @if (genresExpanded()) {
+              <div class="filter-body genre-grid">
+                @if (genres().length === 0) {
+                  <div class="genre-loading">
+                    @for (i of skeletonGenres; track i) {
+                      <div class="genre-skeleton shimmer"></div>
                     }
+                  </div>
+                } @else {
+                  @for (genre of genres(); track genre.mal_id) {
+                    <button
+                      class="genre-tag-btn"
+                      [class.active]="isGenreSelected(genre.mal_id)"
+                      (click)="toggleGenre(genre.mal_id)"
+                    >
+                      {{ genre.name }}
+                    </button>
                   }
-                </div>
-              }
-            </div>
-
-            <!-- Score Filter -->
-            <div class="filter-group">
-              <button class="filter-group-header" (click)="scoreExpanded.set(!scoreExpanded())">
-                <span class="filter-label">
-                  <span class="material-symbols-outlined icon-sm">star</span>
-                  Puntuación mínima
-                </span>
-                @if (selectedScore()) {
-                  <span class="active-count">{{ selectedScore() }}+</span>
                 }
-                <span class="material-symbols-outlined chevron" [class.rotated]="scoreExpanded()">
-                  expand_more
-                </span>
-              </button>
-              @if (scoreExpanded()) {
-                <div class="filter-body">
-                  <select
-                    class="filter-select select-field"
-                    [ngModel]="selectedScore()"
-                    (ngModelChange)="onScoreChange($event)"
-                  >
-                    <option [ngValue]="null">Cualquiera</option>
-                    @for (s of scoreOptions; track s) {
-                      <option [ngValue]="s">{{ s }}+ estrellas</option>
-                    }
-                  </select>
-                </div>
-              }
-            </div>
+              </div>
+            }
+          </div>
 
-            <!-- Year Filter -->
-            <div class="filter-group">
-              <button class="filter-group-header" (click)="yearExpanded.set(!yearExpanded())">
-                <span class="filter-label">
-                  <span class="material-symbols-outlined icon-sm">calendar_month</span>
-                  Año
-                </span>
-                @if (selectedYear()) {
-                  <span class="active-count">{{ selectedYear() }}</span>
-                }
-                <span class="material-symbols-outlined chevron" [class.rotated]="yearExpanded()">
-                  expand_more
-                </span>
-              </button>
-              @if (yearExpanded()) {
-                <div class="filter-body">
-                  <select
-                    class="filter-select select-field"
-                    [ngModel]="selectedYear()"
-                    (ngModelChange)="onYearChange($event)"
-                  >
-                    <option [ngValue]="null">Todos</option>
-                    @for (y of yearOptions; track y) {
-                      <option [ngValue]="y">{{ y }}</option>
-                    }
-                  </select>
-                </div>
+          <!-- Filtro de Puntuación Mínima -->
+          <div class="filter-group">
+            <button class="filter-group-header" (click)="scoreExpanded.set(!scoreExpanded())">
+              <span class="filter-label">
+                <span class="material-symbols-outlined icon-sm">star</span>
+                Puntuación mínima
+              </span>
+              @if (selectedScore()) {
+                <span class="active-count">{{ selectedScore() }}+</span>
               }
-            </div>
+              <span class="material-symbols-outlined chevron" [class.rotated]="scoreExpanded()">
+                expand_more
+              </span>
+            </button>
+            @if (scoreExpanded()) {
+              <div class="filter-body">
+                <select
+                  class="filter-select select-field"
+                  [ngModel]="selectedScore()"
+                  (ngModelChange)="onScoreChange($event)"
+                >
+                  <option [ngValue]="null">Cualquiera</option>
+                  @for (s of scoreOptions; track s) {
+                    <option [ngValue]="s">{{ s }}+ estrellas</option>
+                  }
+                </select>
+              </div>
+            }
+          </div>
 
-            <!-- Season Filter -->
-            <div class="filter-group">
-              <button class="filter-group-header" (click)="seasonExpanded.set(!seasonExpanded())">
-                <span class="filter-label">
-                  <span class="material-symbols-outlined icon-sm">sunny</span>
-                  Temporada
-                </span>
-                @if (selectedSeason()) {
-                  <span class="active-count">{{ getSeasonLabel(selectedSeason()!) }}</span>
-                }
-                <span class="material-symbols-outlined chevron" [class.rotated]="seasonExpanded()">
-                  expand_more
-                </span>
-              </button>
-              @if (seasonExpanded()) {
-                <div class="filter-body">
-                  <select
-                    class="filter-select select-field"
-                    [ngModel]="selectedSeason()"
-                    (ngModelChange)="onSeasonChange($event)"
-                  >
-                    <option [ngValue]="null">Todas</option>
-                    @for (sea of seasonOptions; track sea.value) {
-                      <option [ngValue]="sea.value">{{ sea.label }}</option>
-                    }
-                  </select>
-                </div>
+          <!-- Filtro de Año -->
+          <div class="filter-group">
+            <button class="filter-group-header" (click)="yearExpanded.set(!yearExpanded())">
+              <span class="filter-label">
+                <span class="material-symbols-outlined icon-sm">calendar_month</span>
+                Año
+              </span>
+              @if (selectedYear()) {
+                <span class="active-count">{{ selectedYear() }}</span>
               }
-            </div>
+              <span class="material-symbols-outlined chevron" [class.rotated]="yearExpanded()">
+                expand_more
+              </span>
+            </button>
+            @if (yearExpanded()) {
+              <div class="filter-body">
+                <select
+                  class="filter-select select-field"
+                  [ngModel]="selectedYear()"
+                  (ngModelChange)="onYearChange($event)"
+                >
+                  <option [ngValue]="null">Todos</option>
+                  @for (y of yearOptions; track y) {
+                    <option [ngValue]="y">{{ y }}</option>
+                  }
+                </select>
+              </div>
+            }
+          </div>
 
-            <!-- Status Filter -->
-            <div class="filter-group">
-              <button class="filter-group-header" (click)="statusExpanded.set(!statusExpanded())">
-                <span class="filter-label">
-                  <span class="material-symbols-outlined icon-sm">tv</span>
-                  Estado
-                </span>
-                @if (selectedStatus()) {
-                  <span class="active-count">{{ getStatusLabel(selectedStatus()!) }}</span>
-                }
-                <span class="material-symbols-outlined chevron" [class.rotated]="statusExpanded()">
-                  expand_more
-                </span>
-              </button>
-              @if (statusExpanded()) {
-                <div class="filter-body">
-                  <select
-                    class="filter-select select-field"
-                    [ngModel]="selectedStatus()"
-                    (ngModelChange)="onStatusChange($event)"
-                  >
-                    <option [ngValue]="null">Todos</option>
-                    @for (st of statusOptions; track st.value) {
-                      <option [ngValue]="st.value">{{ st.label }}</option>
-                    }
-                  </select>
-                </div>
+          <!-- Filtro de Estado -->
+          <div class="filter-group">
+            <button class="filter-group-header" (click)="statusExpanded.set(!statusExpanded())">
+              <span class="filter-label">
+                <span class="material-symbols-outlined icon-sm">tv</span>
+                Estado
+              </span>
+              @if (selectedStatus()) {
+                <span class="active-count">{{ getStatusLabel(selectedStatus()!) }}</span>
               }
-            </div>
+              <span class="material-symbols-outlined chevron" [class.rotated]="statusExpanded()">
+                expand_more
+              </span>
+            </button>
+            @if (statusExpanded()) {
+              <div class="filter-body">
+                <select
+                  class="filter-select select-field"
+                  [ngModel]="selectedStatus()"
+                  (ngModelChange)="onStatusChange($event)"
+                >
+                  <option [ngValue]="null">Todos</option>
+                  @for (st of statusOptions; track st.value) {
+                    <option [ngValue]="st.value">{{ st.label }}</option>
+                  }
+                </select>
+              </div>
+            }
+          </div>
         </aside>
 
         <main class="catalog-content">
           @if (showResults()) {
-            <!-- Results Area -->
             <section class="results-area">
-            <!-- Results Header -->
-            @if (!loading() || results().length > 0) {
-              <div class="results-header">
-                <span class="results-count">
-                  <span class="material-symbols-outlined icon-sm">dashboard</span>
-                  @if (totalResults() > 0) {
-                    {{ totalResults() }} resultados encontrados
-                  } @else if (!loading()) {
-                    Sin resultados
-                  }
-                </span>
-              </div>
-            }
-
-            <!-- Results Grid -->
-            <div class="results-grid">
-              @for (anime of results(); track anime.mal_id) {
-                <app-anime-card [anime]="anime" />
-              }
-
-              <!-- Skeleton Loading -->
-              @if (loading()) {
-                @for (i of skeletonCards; track i) {
-                  <app-skeleton-card />
-                }
-              }
-            </div>
-
-            <!-- Empty State -->
-            @if (!loading() && results().length === 0 && hasSearched()) {
-              <div class="empty-state">
-                <div class="empty-icon">
-                  <span class="material-symbols-outlined">search_off</span>
-                </div>
-                <h3>No se encontraron resultados</h3>
-                <p>Intenta ajustar los filtros o busca con otros términos</p>
-                <button class="btn-glass" (click)="clearAllFilters()">
-                  <span class="material-symbols-outlined icon-sm">restart_alt</span>
-                  Limpiar filtros
-                </button>
-              </div>
-            }
-
-            <!-- Load More -->
-            @if (hasNextPage() && !loading() && results().length > 0) {
-              <div class="load-more-wrapper">
-                <button class="btn-primary load-more-btn" (click)="loadMore()">
-                  <span class="material-symbols-outlined">expand_more</span>
-                  Cargar más
-                </button>
-              </div>
-            }
-
-            <!-- Loading more indicator -->
-            @if (loadingMore()) {
-              <div class="loading-more">
-                <div class="spinner"></div>
-                <span>Cargando más resultados...</span>
-              </div>
-            }
-            </section>
-          } @else {
-        <!-- Default Catalog Sections -->
-        <div class="sections">
-          @for (section of sections; track section.title) {
-            <section class="section">
-              <div class="section-header">
-                <div class="section-header-left">
-                  <span class="material-symbols-outlined section-icon">{{ section.icon }}</span>
-                  <h2 class="section-title">{{ section.title }}</h2>
-                </div>
-                <div class="section-actions">
-                  <a routerLink="/" [queryParams]="getSectionQueryParams(section.title)" class="section-link">
-                    Ver todo
-                    <span class="material-symbols-outlined">chevron_right</span>
-                  </a>
-                  <div class="carousel-controls">
-                    <button
-                      class="carousel-arrow"
-                      (click)="moveSection(section, 'left')"
-                      [disabled]="!canMoveSection(section, 'left')"
-                      aria-label="Mostrar 5 animes anteriores"
-                    >
-                      <span class="material-symbols-outlined">chevron_left</span>
-                    </button>
-                    <button
-                      class="carousel-arrow"
-                      (click)="moveSection(section, 'right')"
-                      [disabled]="!canMoveSection(section, 'right')"
-                      aria-label="Mostrar 5 animes siguientes"
-                    >
-                      <span class="material-symbols-outlined">chevron_right</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              @if (section.error) {
-                <div class="section-error">
-                  <span class="material-symbols-outlined">error_outline</span>
-                  <span>{{ section.error }}</span>
-                  <button class="btn-outline btn-retry" (click)="retrySection(section.title)">
-                    <span class="material-symbols-outlined icon-sm">replay</span>
-                    Reintentar
+              @if (!loading() || results().length > 0) {
+                <div class="results-header">
+                  <span class="results-count">
+                    <span class="material-symbols-outlined icon-sm">dashboard</span>
+                    @if (totalResults() > 0) {
+                      {{ totalResults() }} resultados encontrados
+                    } @else if (!loading()) {
+                      Sin resultados
+                    }
+                  </span>
+                  <button class="btn-ghost" (click)="clearAllFilters()">
+                    <span class="material-symbols-outlined icon-sm">arrow_back</span>
+                    Volver al inicio
                   </button>
                 </div>
-              } @else {
-                <div class="carousel-grid">
-                  @if (section.loading) {
-                    @for (item of carouselSkeletons; track item) {
-                      <app-skeleton-card />
-                    }
-                  } @else {
-                    @for (anime of getVisibleSectionItems(section); track anime.mal_id) {
-                      <app-anime-card [anime]="anime" />
-                    }
+              }
+
+              <div class="results-grid">
+                @for (anime of results(); track anime.mal_id) {
+                  <app-anime-card [anime]="anime" />
+                }
+
+                @if (loading()) {
+                  @for (i of skeletonCards; track i) {
+                    <app-skeleton-card />
                   }
+                }
+              </div>
+
+              @if (!loading() && results().length === 0 && hasSearched()) {
+                <div class="empty-state">
+                  <div class="empty-icon">
+                    <span class="material-symbols-outlined">search_off</span>
+                  </div>
+                  <h3>No se encontraron resultados</h3>
+                  <p>Intenta ajustar los filtros o busca con otros términos</p>
+                  <button class="btn-glass" (click)="clearAllFilters()">
+                    <span class="material-symbols-outlined icon-sm">restart_alt</span>
+                    Limpiar filtros
+                  </button>
+                </div>
+              }
+
+              @if (hasNextPage() && !loading() && results().length > 0) {
+                <div class="load-more-wrapper">
+                  <button class="btn-primary load-more-btn" (click)="loadMore()">
+                    <span class="material-symbols-outlined">expand_more</span>
+                    Cargar más
+                  </button>
+                </div>
+              }
+
+              @if (loadingMore()) {
+                <div class="loading-more">
+                  <div class="spinner"></div>
+                  <span>Cargando más resultados...</span>
                 </div>
               }
             </section>
-          }
+          } @else {
+            <!-- Secciones por defecto de Inicio -->
+            <div class="sections">
+              @for (section of sections(); track section.title) {
+                <section class="section">
+                  <div class="section-header">
+                    <div class="section-header-left">
+                      <span class="material-symbols-outlined section-icon">{{ section.icon }}</span>
+                      <h2 class="section-title">{{ section.title }}</h2>
+                    </div>
+                    <div class="section-actions">
+                      <a routerLink="/" [queryParams]="getSectionQueryParams(section.title)" class="section-link">
+                        Ver todo
+                        <span class="material-symbols-outlined">chevron_right</span>
+                      </a>
+                      <div class="carousel-controls">
+                        <button
+                          class="carousel-arrow"
+                          (click)="moveSection(section, 'left')"
+                          [disabled]="!canMoveSection(section, 'left')"
+                          aria-label="Mostrar animes anteriores"
+                        >
+                          <span class="material-symbols-outlined">chevron_left</span>
+                        </button>
+                        <button
+                          class="carousel-arrow"
+                          (click)="moveSection(section, 'right')"
+                          [disabled]="!canMoveSection(section, 'right')"
+                          aria-label="Mostrar animes siguientes"
+                        >
+                          <span class="material-symbols-outlined">chevron_right</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  @if (section.error) {
+                    <div class="section-error">
+                      <span class="material-symbols-outlined">error_outline</span>
+                      <span>{{ section.error }}</span>
+                      <button class="btn-outline btn-retry" (click)="retrySection(section.title)">
+                        <span class="material-symbols-outlined icon-sm">replay</span>
+                        Reintentar
+                      </button>
+                    </div>
+                  } @else {
+                    <div class="carousel-grid">
+                      @if (section.loading) {
+                        @for (item of carouselSkeletons; track item) {
+                          <app-skeleton-card />
+                        }
+                      } @else {
+                        @for (anime of getVisibleSectionItems(section); track anime.mal_id) {
+                          <app-anime-card [anime]="anime" />
+                        }
+                      }
+                    </div>
+                  }
+                </section>
+              }
             </div>
           }
         </main>
@@ -368,14 +335,14 @@ interface SectionData {
       <div class="container footer-inner">
         <span class="footer-brand">AnimeHub</span>
         <span class="footer-divider">•</span>
-        <span>Datos proporcionados por <a href="https://jikan.moe" target="_blank" rel="noopener">Jikan API</a></span>
+        <span>Datos proporcionados por <a href="https://anilist.co" target="_blank" rel="noopener">AniList API</a></span>
       </div>
     </footer>
   `,
   styles: [`
     .hero {
       position: relative;
-      padding: 4rem 0 3rem;
+      padding: 3rem 0 2.5rem;
       overflow: hidden;
     }
 
@@ -414,11 +381,10 @@ interface SectionData {
       line-height: 1.5;
     }
 
-    /* ===== Search Bar ===== */
     .search-bar-wrapper {
       width: 100%;
       max-width: 560px;
-      margin-top: 1.5rem;
+      margin-top: 1rem;
     }
 
     .search-bar {
@@ -479,10 +445,9 @@ interface SectionData {
       }
     }
 
-    /* ===== Main Content ===== */
     .main-content {
       padding-bottom: 4rem;
-      margin-top: 2rem;
+      margin-top: 1.5rem;
     }
 
     .catalog-layout {
@@ -504,6 +469,10 @@ interface SectionData {
       display: flex;
       flex-direction: column;
       gap: 2.5rem;
+    }
+
+    .section {
+      padding-block: 0;
     }
 
     .section-header {
@@ -577,8 +546,8 @@ interface SectionData {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 44px;
-      height: 44px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
       background: rgba(0, 0, 0, 0.03);
       border: 1px solid var(--border);
@@ -593,17 +562,9 @@ interface SectionData {
         box-shadow: var(--shadow-lg);
       }
 
-      &:active:not(:disabled) {
-        transform: scale(0.96);
-      }
-
       &:disabled {
         opacity: 0.38;
         cursor: not-allowed;
-      }
-
-      .material-symbols-outlined {
-        font-size: 1.5rem;
       }
     }
 
@@ -647,27 +608,15 @@ interface SectionData {
 
     .filters-sidebar {
       position: sticky;
-      top: 5rem;
+      top: 5.5rem;
       border-radius: var(--radius-lg);
       background: var(--surface-card);
       border: 1px solid var(--border);
       overflow: hidden;
-      animation: slideDown 0.3s ease;
 
       @media (max-width: 900px) {
         position: static;
         margin-bottom: 1.5rem;
-      }
-    }
-
-    @keyframes slideDown {
-      from {
-        opacity: 0;
-        transform: translateY(-8px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
       }
     }
 
@@ -813,16 +762,11 @@ interface SectionData {
       width: 100%;
       cursor: pointer;
       font-size: 0.85rem;
-
-      option {
-        background: var(--surface);
-        color: var(--text-primary);
-      }
     }
 
-    /* ===== Results Area ===== */
     .results-area {
       min-height: 300px;
+      padding-block: 0;
     }
 
     .results-header {
@@ -830,6 +774,8 @@ interface SectionData {
       align-items: center;
       justify-content: space-between;
       margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+      gap: 0.75rem;
     }
 
     .results-count {
@@ -852,7 +798,6 @@ interface SectionData {
       }
     }
 
-    /* ===== Empty State ===== */
     .empty-state {
       display: flex;
       flex-direction: column;
@@ -879,18 +824,6 @@ interface SectionData {
       }
     }
 
-    .empty-state h3 {
-      font-size: 1.25rem;
-      color: var(--text-primary);
-    }
-
-    .empty-state p {
-      color: var(--text-muted);
-      font-size: 0.9rem;
-      max-width: 360px;
-    }
-
-    /* ===== Load More ===== */
     .load-more-wrapper {
       display: flex;
       justify-content: center;
@@ -925,7 +858,6 @@ interface SectionData {
       to { transform: rotate(360deg); }
     }
 
-    /* ===== Footer ===== */
     .footer {
       border-top: 1px solid var(--border);
       padding: 1.5rem 0;
@@ -947,33 +879,20 @@ interface SectionData {
       font-weight: 700;
       color: var(--primary);
     }
-
-    .footer-divider {
-      color: var(--border);
-    }
-
-    .footer a {
-      color: var(--text-secondary);
-      &:hover {
-        color: var(--primary);
-      }
-    }
   `]
 })
 export class CatalogComponent implements OnInit, OnDestroy {
-  private jikanService = inject(JikanService);
+  private anilistService = inject(AnilistService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 
-  // Default sections
-  sections: SectionData[] = [
+  sections = signal<SectionData[]>([
     { title: 'Top Airing', icon: 'trending_up', items: [], loading: true, error: null },
     { title: 'Temporada Actual', icon: 'calendar_month', items: [], loading: true, error: null },
     { title: 'Más Populares', icon: 'whatshot', items: [], loading: true, error: null },
     { title: 'Próximamente', icon: 'new_releases', items: [], loading: true, error: null },
-  ];
+  ]);
 
-  // Search state
   searchQuery = signal('');
   results = signal<Anime[]>([]);
   loading = signal(false);
@@ -983,50 +902,38 @@ export class CatalogComponent implements OnInit, OnDestroy {
   hasNextPage = signal(false);
   currentPage = signal(1);
 
-  // Filter state
   genres = signal<Genre[]>([]);
   selectedGenres = signal<number[]>([]);
   selectedScore = signal<number | null>(null);
   selectedYear = signal<number | null>(null);
-  selectedSeason = signal<string | null>(null);
   selectedStatus = signal<string | null>(null);
+  selectedSort = signal<string | null>(null);
 
-  // UI state - COLLAPSED BY DEFAULT (sin abrir)
   genresExpanded = signal(false);
   scoreExpanded = signal(false);
   yearExpanded = signal(false);
-  seasonExpanded = signal(false);
   statusExpanded = signal(false);
   sectionOffsets = signal<Record<string, number>>({});
 
-  // Active filter count
   activeFilterCount = computed(() => {
     let count = 0;
     if (this.selectedGenres().length > 0) count++;
     if (this.selectedScore()) count++;
     if (this.selectedYear()) count++;
-    if (this.selectedSeason()) count++;
     if (this.selectedStatus()) count++;
+    if (this.selectedSort()) count++;
     return count;
   });
 
-  // Switcher: show search results or default scroll sections
   showResults = computed(() => {
     return this.searchQuery().trim().length > 0 || this.activeFilterCount() > 0;
   });
 
-  // Options
-  scoreOptions = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+  scoreOptions = [1, 2, 3, 4, 5, 6, 7, 8, 9];
   statusOptions = [
     { value: 'airing', label: 'En emisión' },
     { value: 'complete', label: 'Finalizado' },
     { value: 'upcoming', label: 'Próximamente' }
-  ];
-  seasonOptions = [
-    { value: 'summer', label: 'Verano' },
-    { value: 'spring', label: 'Primavera' },
-    { value: 'fall', label: 'Otoño' },
-    { value: 'winter', label: 'Invierno' }
   ];
   yearOptions: number[] = [];
   skeletonCards = Array.from({ length: 12 }, (_, i) => i);
@@ -1034,113 +941,93 @@ export class CatalogComponent implements OnInit, OnDestroy {
   carouselSkeletons = Array.from({ length: 5 }, (_, i) => i);
   private readonly carouselStep = 5;
 
-  // RxJS
   private searchSubject = new Subject<string>();
   private subscriptions = new Subscription();
+  private searchSubscription?: Subscription;
+  private isInternalUrlUpdate = false;
 
   ngOnInit(): void {
-    // Build year options from current year to 1980
     const currentYear = new Date().getFullYear();
     this.yearOptions = Array.from({ length: currentYear - 1980 + 1 }, (_, i) => currentYear - i);
 
-    // Load default sections
-    this.loadSection(0, () => this.jikanService.getTopAiring());
-    this.loadSection(1, () => this.jikanService.getCurrentSeason());
-    this.loadSection(2, () => this.jikanService.getPopular());
-    this.loadSection(3, () => this.jikanService.getRecentUpcoming());
+    this.loadSection(0, () => this.anilistService.getTopAiring());
+    this.loadSection(1, () => this.anilistService.getCurrentSeason());
+    this.loadSection(2, () => this.anilistService.getPopular());
+    this.loadSection(3, () => this.anilistService.getRecentUpcoming());
 
-    // Fetch genres for the sidebar
     this.subscriptions.add(
-      this.jikanService.getGenres().subscribe(genres => this.genres.set(genres))
+      this.anilistService.getGenres().subscribe(genres => this.genres.set(genres))
     );
 
-    // Setup debounced search
     this.subscriptions.add(
       this.searchSubject.pipe(
-        debounceTime(500),
+        debounceTime(300),
         distinctUntilChanged()
-      ).subscribe(query => {
-        this.searchQuery.set(query);
+      ).subscribe(() => {
         this.currentPage.set(1);
-        this.results.set([]);
         this.syncFiltersToUrl();
         if (this.showResults()) {
           this.executeSearch();
+        } else {
+          this.results.set([]);
+          this.totalResults.set(0);
+          this.hasSearched.set(false);
         }
       })
     );
 
-    // Read initial query params from URL
     this.subscriptions.add(
       this.route.queryParams.subscribe(params => {
-        let shouldSearch = false;
-
-        // Sync query
-        if (params['q'] !== undefined && params['q'] !== this.searchQuery()) {
-          this.searchQuery.set(params['q']);
-          shouldSearch = true;
+        if (this.isInternalUrlUpdate) {
+          this.isInternalUrlUpdate = false;
+          return;
         }
 
-        // Sync genres and their expansion state (expand if active, otherwise collapse)
+        const qParam = params['q'] ?? '';
+        this.searchQuery.set(qParam);
+
         if (params['genres']) {
-          const genreIds = params['genres'].split(',').map((id: string) => +id).filter((id: number) => !isNaN(id));
+          const genreIds = String(params['genres'])
+            .split(',')
+            .map(id => Number(id))
+            .filter(id => !isNaN(id));
           this.selectedGenres.set(genreIds);
           this.genresExpanded.set(true);
-          shouldSearch = true;
         } else {
           this.selectedGenres.set([]);
-          this.genresExpanded.set(false);
         }
 
-        // Sync score and expansion state
         if (params['score']) {
-          this.selectedScore.set(+params['score'] || null);
+          this.selectedScore.set(Number(params['score']) || null);
           this.scoreExpanded.set(true);
-          shouldSearch = true;
         } else {
           this.selectedScore.set(null);
-          this.scoreExpanded.set(false);
         }
 
-        // Sync year and expansion state
         if (params['year']) {
-          this.selectedYear.set(+params['year'] || null);
+          this.selectedYear.set(Number(params['year']) || null);
           this.yearExpanded.set(true);
-          shouldSearch = true;
         } else {
           this.selectedYear.set(null);
-          this.yearExpanded.set(false);
         }
 
-        // Sync season and expansion state
-        if (params['season']) {
-          this.selectedSeason.set(params['season']);
-          this.seasonExpanded.set(true);
-          shouldSearch = true;
-        } else {
-          this.selectedSeason.set(null);
-          this.seasonExpanded.set(false);
-        }
-
-        // Sync status and expansion state
         if (params['status']) {
           this.selectedStatus.set(params['status']);
           this.statusExpanded.set(true);
-          shouldSearch = true;
         } else {
           this.selectedStatus.set(null);
-          this.statusExpanded.set(false);
         }
 
-        // Sync page
-        if (params['page']) {
-          this.currentPage.set(+params['page'] || 1);
-        } else {
-          this.currentPage.set(1);
-        }
+        this.selectedSort.set(params['sort'] || null);
+        this.currentPage.set(Number(params['page']) || 1);
 
-        if (shouldSearch || this.showResults()) {
+        if (this.showResults()) {
           this.executeSearch();
+        } else {
+          this.results.set([]);
+          this.totalResults.set(0);
+          this.hasSearched.set(false);
+          this.hasNextPage.set(false);
         }
       })
     );
@@ -1151,6 +1038,7 @@ export class CatalogComponent implements OnInit, OnDestroy {
   }
 
   onSearchInput(value: string): void {
+    this.searchQuery.set(value);
     this.searchSubject.next(value);
   }
 
@@ -1175,22 +1063,17 @@ export class CatalogComponent implements OnInit, OnDestroy {
   }
 
   onScoreChange(value: number | null): void {
-    this.selectedScore.set(value);
+    this.selectedScore.set(value ? Number(value) : null);
     this.onFilterChange();
   }
 
   onYearChange(value: number | null): void {
-    this.selectedYear.set(value);
-    this.onFilterChange();
-  }
-
-  onSeasonChange(value: string | null): void {
-    this.selectedSeason.set(value);
+    this.selectedYear.set(value ? Number(value) : null);
     this.onFilterChange();
   }
 
   onStatusChange(value: string | null): void {
-    this.selectedStatus.set(value);
+    this.selectedStatus.set(value || null);
     this.onFilterChange();
   }
 
@@ -1198,33 +1081,29 @@ export class CatalogComponent implements OnInit, OnDestroy {
     return this.statusOptions.find(s => s.value === value)?.label || value;
   }
 
-  getSeasonLabel(value: string): string {
-    return this.seasonOptions.find(s => s.value === value)?.label || value;
-  }
-
   clearAllFilters(): void {
     this.searchQuery.set('');
     this.selectedGenres.set([]);
     this.selectedScore.set(null);
     this.selectedYear.set(null);
-    this.selectedSeason.set(null);
     this.selectedStatus.set(null);
+    this.selectedSort.set(null);
     this.currentPage.set(1);
     this.results.set([]);
     this.hasSearched.set(false);
     this.totalResults.set(0);
     this.hasNextPage.set(false);
 
-    // Collapse all accordion headers on clear
     this.genresExpanded.set(false);
     this.scoreExpanded.set(false);
     this.yearExpanded.set(false);
-    this.seasonExpanded.set(false);
     this.statusExpanded.set(false);
 
+    this.isInternalUrlUpdate = true;
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: {},
+      replaceUrl: true
     });
   }
 
@@ -1238,32 +1117,30 @@ export class CatalogComponent implements OnInit, OnDestroy {
     this.currentPage.set(1);
     this.results.set([]);
     this.syncFiltersToUrl();
-    this.executeSearch();
+    if (this.showResults()) {
+      this.executeSearch();
+    } else {
+      this.hasSearched.set(false);
+      this.totalResults.set(0);
+      this.hasNextPage.set(false);
+    }
   }
 
   private syncFiltersToUrl(): void {
     const queryParams: Record<string, string | null> = {};
 
-    queryParams['q'] = this.searchQuery() || null;
-    queryParams['genres'] = this.selectedGenres().length > 0
-      ? this.selectedGenres().join(',')
-      : null;
-    queryParams['score'] = this.selectedScore()
-      ? String(this.selectedScore())
-      : null;
-    queryParams['year'] = this.selectedYear()
-      ? String(this.selectedYear())
-      : null;
-    queryParams['season'] = this.selectedSeason() || null;
-    queryParams['status'] = this.selectedStatus() || null;
-    queryParams['page'] = this.currentPage() > 1
-      ? String(this.currentPage())
-      : null;
+    if (this.searchQuery().trim()) queryParams['q'] = this.searchQuery().trim();
+    if (this.selectedGenres().length > 0) queryParams['genres'] = this.selectedGenres().join(',');
+    if (this.selectedScore()) queryParams['score'] = String(this.selectedScore());
+    if (this.selectedYear()) queryParams['year'] = String(this.selectedYear());
+    if (this.selectedStatus()) queryParams['status'] = this.selectedStatus();
+    if (this.selectedSort()) queryParams['sort'] = this.selectedSort();
+    if (this.currentPage() > 1) queryParams['page'] = String(this.currentPage());
 
+    this.isInternalUrlUpdate = true;
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams,
-      queryParamsHandling: 'replace',
       replaceUrl: true,
     });
   }
@@ -1287,72 +1164,80 @@ export class CatalogComponent implements OnInit, OnDestroy {
       score?: number;
       status?: string;
       year?: number;
-      season?: string;
-    } = {};
+      sort?: string;
+    } = {
+      page: this.currentPage()
+    };
 
-    if (this.searchQuery()) filters.q = this.searchQuery();
-    filters.page = this.currentPage();
+    if (this.searchQuery().trim()) filters.q = this.searchQuery().trim();
     if (this.selectedGenres().length > 0) filters.genres = this.selectedGenres().join(',');
     if (this.selectedScore()) filters.score = this.selectedScore()!;
     if (this.selectedYear()) filters.year = this.selectedYear()!;
-    if (this.selectedSeason()) filters.season = this.selectedSeason()!;
     if (this.selectedStatus()) filters.status = this.selectedStatus()!;
+    if (this.selectedSort()) filters.sort = this.selectedSort()!;
 
-    this.subscriptions.add(
-      this.jikanService.searchAnime(filters).pipe(
-        finalize(() => {
-          this.loading.set(false);
-          this.loadingMore.set(false);
-        })
-      ).subscribe({
-        next: response => {
-          if (append) {
-            this.results.update(prev => [...prev, ...response.data]);
-          } else {
-            this.results.set(response.data);
-          }
-          this.totalResults.set(response.pagination?.items?.total ?? response.data.length);
-          this.hasNextPage.set(response.pagination?.has_next_page ?? false);
-        },
-        error: err => {
-          console.error('Search error:', err);
-          if (!append) {
-            this.results.set([]);
-            this.totalResults.set(0);
-          }
-        }
+    if (!append && this.searchSubscription) {
+      this.searchSubscription.unsubscribe();
+    }
+
+    this.searchSubscription = this.anilistService.searchAnime(filters).pipe(
+      finalize(() => {
+        this.loading.set(false);
+        this.loadingMore.set(false);
       })
-    );
+    ).subscribe({
+      next: response => {
+        if (append) {
+          this.results.update(prev => [...prev, ...response.data]);
+        } else {
+          this.results.set(response.data);
+        }
+        this.totalResults.set(response.pagination?.items?.total ?? response.data.length);
+        this.hasNextPage.set(response.pagination?.has_next_page ?? false);
+      },
+      error: err => {
+        console.error('Search error:', err);
+        if (!append) {
+          this.results.set([]);
+          this.totalResults.set(0);
+        }
+      }
+    });
+
+    this.subscriptions.add(this.searchSubscription);
   }
 
-  // Load default sections
   private loadSection(
     index: number,
-    fetchFn: () => ReturnType<typeof this.jikanService.getTopAiring>
+    fetchFn: () => ReturnType<typeof this.anilistService.getTopAiring>
   ) {
-    this.sections[index].loading = true;
-    this.sections[index].error = null;
+    this.sections.update(list =>
+      list.map((sec, i) => i === index ? { ...sec, loading: true, error: null } : sec)
+    );
+
     fetchFn().subscribe({
       next: (res) => {
-        this.sections[index].items = res.data;
-        this.sections[index].loading = false;
+        this.sections.update(list =>
+          list.map((sec, i) => i === index ? { ...sec, items: res.data, loading: false } : sec)
+        );
       },
       error: () => {
-        this.sections[index].loading = false;
-        this.sections[index].error = 'Error al cargar esta sección.';
+        this.sections.update(list =>
+          list.map((sec, i) => i === index ? { ...sec, loading: false, error: 'Error al cargar esta sección.' } : sec)
+        );
       }
     });
   }
 
   retrySection(title: string) {
-    const idx = this.sections.findIndex(s => s.title === title);
+    const idx = this.sections().findIndex(s => s.title === title);
     if (idx < 0) return;
-    
-    let fetchFn: () => ReturnType<typeof this.jikanService.getTopAiring>;
-    if (title === 'Top Airing') fetchFn = () => this.jikanService.getTopAiring();
-    else if (title === 'Temporada Actual') fetchFn = () => this.jikanService.getCurrentSeason();
-    else if (title === 'Más Populares') fetchFn = () => this.jikanService.getPopular();
-    else fetchFn = () => this.jikanService.getRecentUpcoming();
+
+    let fetchFn: () => ReturnType<typeof this.anilistService.getTopAiring>;
+    if (title === 'Top Airing') fetchFn = () => this.anilistService.getTopAiring();
+    else if (title === 'Temporada Actual') fetchFn = () => this.anilistService.getCurrentSeason();
+    else if (title === 'Más Populares') fetchFn = () => this.anilistService.getPopular();
+    else fetchFn = () => this.anilistService.getRecentUpcoming();
 
     this.loadSection(idx, fetchFn);
   }
@@ -1365,7 +1250,7 @@ export class CatalogComponent implements OnInit, OnDestroy {
     } else if (title === 'Temporada Actual') {
       return { status: 'airing', year: new Date().getFullYear() };
     }
-    return { q: '' };
+    return { sort: 'popular' };
   }
 
   getVisibleSectionItems(section: SectionData): Anime[] {
